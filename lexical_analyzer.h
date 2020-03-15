@@ -1,6 +1,7 @@
 #ifndef LEXICAL_ANALYZER_H
 
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 
 using namespace std;
@@ -11,6 +12,7 @@ class TransitionTableRow {
    */
  private:
   unordered_map<string, int> row_;
+
  public:
   TransitionTableRow() = default;
   ~TransitionTableRow() = default;
@@ -29,9 +31,8 @@ class TransitionTable {
    */
  private:
   int number_of_states_;
-  int initial_state_;
-  int final_state_;
   unordered_map<int, TransitionTableRow> table_;
+
  public:
   explicit TransitionTable(int ns);
   ~TransitionTable() = default;
@@ -39,7 +40,25 @@ class TransitionTable {
   TransitionTableRow operator[](int state);
 
   void add_transition(int prev_state, int next_state, string input);
-  int move(int state, const string &input);
+  int compute_next_state(int state, const string &input);
+};
+
+class FiniteAutomata {
+ private:
+  int initial_state_;
+  unordered_set<int> final_states_;
+  int current_state_;
+  TransitionTable table_;
+
+ public:
+  FiniteAutomata(TransitionTable table, int initial_state, unordered_set<int> final_states)
+    :table_{table}, initial_state_{initial_state},
+    final_states_{final_states}, current_state_{initial_state} {}
+
+  ~FiniteAutomata() = default;
+
+  void move(string input);
+  bool has_accepted();
 };
 
 #endif // LEXICAL_ANALYZER_H

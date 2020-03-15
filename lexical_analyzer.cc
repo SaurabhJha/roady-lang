@@ -2,8 +2,6 @@
 
 TransitionTable::TransitionTable(int ns) {
   number_of_states_ = ns;
-  initial_state_ = 1;
-  final_state_ = number_of_states_;
   for (int state = 1; state <= number_of_states_; ++state)
     table_[state] = TransitionTableRow();
 }
@@ -16,6 +14,20 @@ TransitionTableRow TransitionTable::operator[](int state) {
   return table_[state];
 }
 
-int TransitionTable::move(int state, const string& input) {
+int TransitionTable::compute_next_state(int state, const string &input)
+{
   return table_[state][input];
+}
+
+void FiniteAutomata::move(string input)
+{
+  current_state_ = table_.compute_next_state(current_state_, input);
+}
+
+bool FiniteAutomata::has_accepted()
+{
+  if (final_states_.find(current_state_) == final_states_.end())
+    return false;
+  else
+    return true;
 }
