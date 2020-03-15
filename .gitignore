@@ -1,0 +1,5 @@
+executable
+
+# CLion
+cmake-build-debug
+.idea
