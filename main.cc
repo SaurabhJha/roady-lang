@@ -7,8 +7,13 @@ using namespace std;
 
 int main()
 {
-  string test_input = "12+2*3";
-  // id: 2, number: 2, plus: 0, star: 0
-  FiniteAutomaton automaton = construct_automaton_for_plus();
-  cout << get_next_lexeme_end(test_input, 2, automaton) << "\n";
+  while (1) {
+    string input;
+    cin >> input;
+    for (Token token : tokenize(input)) {
+      token.print();
+      cout << " ";
+    }
+    cout << "\n";
+  }
 }

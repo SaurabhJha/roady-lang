@@ -1,8 +1,9 @@
 #ifndef LEXICAL_ANALYZER_H
 
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <string>
+#include <vector>
 using namespace std;
 
 /**
@@ -83,11 +84,33 @@ class FiniteAutomaton {
   int get_current_state() { return current_state_; } // TODO: Remove this.
 };
 
+/**
+ * These are the token types we support. "invalid" token is for unrecognizable tokens.
+ */
+enum class TokenType { invalid,id,number,plus,star,open_bracket,
+                       close_bracket,open_paran,close_paran,comma};
+
+class Token
+{
+ private:
+  TokenType token_type_;
+  string lexeme_;
+  int next_token_index_;
+ public:
+  Token(TokenType token_type, string lexeme, int next_token_index)
+      :token_type_{token_type}, lexeme_{lexeme}, next_token_index_{next_token_index} {}
+  ~Token() = default;
+
+  int get_next_token_index() { return next_token_index_; }
+  void print();
+};
+
 FiniteAutomaton construct_automaton_for_id();
 FiniteAutomaton construct_automaton_for_number();
-FiniteAutomaton construct_automaton_for_plus();
-FiniteAutomaton construct_automaton_for_star();
+FiniteAutomaton construct_automaton_for_special_character(string special_character);
 
-enum class TokenType {id,number,plus,star};
+string remove_whitespace(string input);
+Token get_next_token(string input, int start_index);
+vector<Token> tokenize(string input);
 
 #endif // LEXICAL_ANALYZER_H_

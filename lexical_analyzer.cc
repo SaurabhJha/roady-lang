@@ -1,5 +1,7 @@
 #include <unordered_set>
-#include <iostream> // TODO: Remove this.
+#include <vector>
+#include <iostream>
+using namespace std;
 
 #include "./lexical_analyzer.h"
 
@@ -85,20 +87,136 @@ FiniteAutomaton construct_automaton_for_number()
   return FiniteAutomaton(initial_state, final_states, table);
 }
 
-FiniteAutomaton construct_automaton_for_plus()
+FiniteAutomaton construct_automaton_for_special_character(string special_character)
 {
   TransitionTable table(2);
-  table.add_transition(1, 2, "+");
+  table.add_transition(1, 2, special_character);
   int initial_state = 1;
   unordered_set<int> final_states = {2};
   return FiniteAutomaton(initial_state, final_states, table);
 }
 
-FiniteAutomaton construct_automaton_for_star()
+void Token::print()
 {
-  TransitionTable table(2);
-  table.add_transition(1, 2, "*");
-  int initial_state {1};
-  unordered_set<int> final_states {2};
-  return FiniteAutomaton(initial_state, final_states, table);
+  string token_type_string;
+  switch (token_type_) {
+    case (TokenType::id):
+      token_type_string = "id";
+      break;
+    case (TokenType::number):
+      token_type_string = "number";
+      break;
+    case (TokenType::star):
+      token_type_string = "*";
+      break;
+    case (TokenType::plus):
+      token_type_string = "+";
+      break;
+    case (TokenType::comma):
+      token_type_string = ",";
+      break;
+    case (TokenType::open_bracket):
+      token_type_string = "[";
+      break;
+    case (TokenType::close_bracket):
+      token_type_string = "]";
+      break;
+    case (TokenType::open_paran):
+      token_type_string = "(";
+      break;
+    case (TokenType::close_paran):
+      token_type_string = ")";
+      break;
+    case (TokenType::invalid):
+      token_type_string = "invalid";
+      break;
+  }
+  cout << "<" << token_type_string << ", " << lexeme_ << ">";
+}
+
+string remove_whitespace(string input)
+{
+  string output {""};
+  for (auto character : input) {
+    if (character != ' ')
+      output.push_back(character);
+  }
+  return output;
+}
+
+/**
+ * @param input
+ * @param start_index
+ * @return next_token
+ * Tries all automatons in turn and gets the token with the longest lexeme;
+ * its an implementation of maximal munch policy.
+ */
+Token get_next_token(string input, int start_index)
+{
+  vector<FiniteAutomaton> vector_of_automata = { construct_automaton_for_number(),
+                                                 construct_automaton_for_id(),
+                                                 construct_automaton_for_special_character("+"),
+                                                 construct_automaton_for_special_character("*"),
+                                                 construct_automaton_for_special_character("["),
+                                                 construct_automaton_for_special_character("]"),
+                                                 construct_automaton_for_special_character("("),
+                                                 construct_automaton_for_special_character(")"),
+                                                 construct_automaton_for_special_character(",") };
+  // Used to correlate automata with token types.
+  vector<TokenType> vector_of_token_types = { TokenType::number,
+                                              TokenType ::id,
+                                              TokenType::plus,
+                                              TokenType::star,
+                                              TokenType::open_bracket,
+                                              TokenType::close_bracket,
+                                              TokenType::open_paran,
+                                              TokenType::close_paran,
+                                              TokenType::comma };
+
+  TokenType next_token_type = TokenType::invalid;
+  int max_next_token_index = start_index - 1;
+  for (int i=0; i<vector_of_automata.size(); ++i) {
+    FiniteAutomaton automaton = vector_of_automata[i];
+    int next_lexeme_end = start_index - 1;
+    for (int current_index = start_index; current_index < input.length(); ++current_index) {
+      string current_input(1, input[current_index]);
+      automaton.move(current_input);
+
+      if (automaton.is_dead()) {
+        break;
+      }
+      if (automaton.has_accepted()) {
+        next_lexeme_end = current_index;
+      }
+    }
+
+    if (next_lexeme_end > max_next_token_index) {
+      max_next_token_index = next_lexeme_end;
+      next_token_type = vector_of_token_types[i];
+    }
+  }
+
+  if (max_next_token_index == start_index - 1) {
+    Token next_token(TokenType::invalid, "", -1);
+    return next_token;
+  } else {
+    Token next_token(next_token_type,
+                     input.substr(start_index, max_next_token_index - start_index + 1),
+                     max_next_token_index);
+    return next_token;
+  }
+}
+
+vector<Token> tokenize(string input)
+{
+  vector<Token> tokens;
+  int index = 0;
+  while (index < input.size()) {
+    Token next_token = get_next_token(input, index);
+    tokens.push_back(next_token);
+    if (next_token.get_next_token_index() == index - 1)
+      break;
+    index = next_token.get_next_token_index() + 1;
+  }
+  return tokens;
 }
