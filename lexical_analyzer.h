@@ -1,4 +1,5 @@
-#ifndef LEXICAL_ANALYZER_H
+#ifndef ROADY_LANG_LEXICAL_ANALYZER_H_
+#define ROADY_LANG_LEXICAL_ANALYZER_H_
 
 #include <string>
 #include <unordered_map>
@@ -113,4 +114,4 @@ string remove_whitespace(string input);
 Token get_next_token(string input, int start_index);
 vector<Token> tokenize(string input);
 
-#endif // LEXICAL_ANALYZER_H_
+#endif // ROADY_LANG_LEXICAL_ANALYZER_H_

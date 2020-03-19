@@ -1,7 +1,7 @@
 CXX=g++
 CXXFLAGS=-std=c++11
 LDFLAGS=-pthread
-SOURCES=main.cc lexical_analyzer.cc
+SOURCES=main.cc lexical_analyzer.cc parser.cc
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=executable
 
