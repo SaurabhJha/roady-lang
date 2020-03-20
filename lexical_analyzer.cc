@@ -34,10 +34,7 @@ bool FiniteAutomaton::is_dead()
 
 bool FiniteAutomaton::has_accepted()
 {
-  for (int state : final_states_) { // TODO: Do this in O(1) time.
-    if (state == current_state_) return true;
-  }
-  return false;
+  return !(final_states_.find(current_state_) == final_states_.end());
 }
 
 void FiniteAutomaton::move(string input)
