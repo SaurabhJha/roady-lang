@@ -2,7 +2,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <iostream> // TODO: Remove this.
 
 #include "./lexical_analyzer.h"
 #include "./parser.h"
