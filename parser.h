@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+
+#include "./lexical_analyzer.h"
 using namespace std;
 
 class Production {
@@ -17,7 +19,14 @@ class Production {
     :left_side_{left_side}, right_side_{right_side} {}
   ~Production() = default;
 
+  bool is_empty() { return left_side_ == "" && right_side_.size() == 0; }
   vector<string> apply();
+  void print()
+  {
+    cout << left_side_ << "-> ";
+    for (auto symbol : right_side_)
+      cout << symbol;
+  }
 };
 
 class ParseTableRow {
@@ -34,9 +43,11 @@ class ParseTableRow {
 class ParseTable {
  private:
   unordered_set<string> non_terminals_;
+  unordered_set<string> terminals_;
   unordered_map<string, ParseTableRow> table_;
  public:
-  ParseTable()
+  ParseTable(unordered_set<string> non_terminals, unordered_set<string> terminals)
+    :non_terminals_{non_terminals}, terminals_{terminals}
   {
     for (string non_terminal : non_terminals_) {
       ParseTableRow row;
@@ -46,7 +57,15 @@ class ParseTable {
   ~ParseTable() = default;
 
   void add_rule(string non_terminal, string terminal, Production production);
+  bool is_non_terminal(string symbol);
+  bool is_terminal(string symbol);
   ParseTableRow operator[](string non_terminal);
 };
+
+string map_token_type_to_terminal(TokenType token_type);
+
+ParseTable construct_parse_table();
+
+vector<Production> parse(vector<Token> tokens);
 
 #endif //ROADY_LANG_PARSER_H_

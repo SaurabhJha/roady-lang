@@ -88,7 +88,7 @@ class FiniteAutomaton {
 /**
  * These are the token types we support. "invalid" token is for unrecognizable tokens.
  */
-enum class TokenType { invalid,id,number,plus,star,open_bracket,
+enum class TokenType { invalid,id,number,plus,minus,star,slash,open_bracket,
                        close_bracket,open_paran,close_paran,comma};
 
 class Token
@@ -102,6 +102,7 @@ class Token
       :token_type_{token_type}, lexeme_{lexeme}, next_token_index_{next_token_index} {}
   ~Token() = default;
 
+  TokenType get_token_type() { return token_type_; };
   int get_next_token_index() { return next_token_index_; }
   void print();
 };

@@ -106,8 +106,14 @@ void Token::print()
     case (TokenType::star):
       token_type_string = "*";
       break;
+    case (TokenType::slash):
+      token_type_string = "/";
+      break;
     case (TokenType::plus):
       token_type_string = "+";
+      break;
+    case (TokenType::minus):
+      token_type_string = "-";
       break;
     case (TokenType::comma):
       token_type_string = ",";
