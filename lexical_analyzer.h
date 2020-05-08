@@ -84,7 +84,6 @@ class FiniteAutomaton {
   void move(string input);
   bool is_dead();
   bool has_accepted();
-  int get_current_state() { return current_state_; } // TODO: Remove this.
 };
 
 /**

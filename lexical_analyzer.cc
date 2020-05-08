@@ -188,7 +188,7 @@ Token get_next_token(string input, int start_index)
   // Used to correlate automata with token types. The order in `vector_of_token_types` must
   // match with `vector_of_automata`.
   vector<TokenType> vector_of_token_types = { TokenType::number,
-                                              TokenType ::id,
+                                              TokenType::id,
                                               TokenType::double_equals,
                                               TokenType::plus,
                                               TokenType::star,
@@ -201,7 +201,8 @@ Token get_next_token(string input, int start_index)
                                               TokenType::comma,
                                               TokenType::equals };
 
-  TokenType next_token_type = TokenType::invalid;
+
+  TokenType next_token_type;
   int max_next_token_index = start_index - 1;
   for (int i=0; i<vector_of_automata.size(); ++i) {
     FiniteAutomaton automaton = vector_of_automata[i];
