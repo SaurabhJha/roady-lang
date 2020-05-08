@@ -88,26 +88,27 @@ string map_token_type_to_terminal(TokenType token_type)
 
 ParseTable construct_parse_table()
 {
-  unordered_set<string> non_terminals = { "start","E","E'","T","T'","F","array","rest","id_suffix" };
+  unordered_set<string> non_terminals = { "start","expr","expr'","term","term'","factor","array","rest","id_suffix",
+                                          "assignee" };
   unordered_set<string> terminals = { "id","number","+","-","*","/","[","]","(",")",",","$","=","==" };
 
-  Production production1("start", vector<string> {"id","id_suffix"});
-  Production production2("start", vector<string> {"E"});
-  Production production3("id_suffix", vector<string> {"=", "assignee"});
-  Production production4("id_suffix", vector<string> {"array"});
-  Production production5("assignee", vector<string> {"array"});
-  Production production6("assignee", vector<string> {"E"});
-  Production production1_x("E", vector<string> { "T","E'" });
-  Production production2_x("E'", vector<string> {"+", "T", "E'" });
-  Production production3_x("E'", vector<string> {"-", "T", "E'" });
-  Production production4_x("E'", vector<string> {});
-  Production production5_x("T", vector<string> { "F","T'" });
-  Production production6_x("T'", vector<string> { "*","F","T'" });
-  Production production7_x("T'", vector<string> {"/", "F", "T'" });
-  Production production8_x("T'", vector<string> {});
-  Production production9_x("F", vector<string> {"number" });
-  Production production10_x("F", vector<string> {"(", "E", ")" });
-  Production production11_x("array", vector<string> {"[", "number", "rest", "]" });
+  Production production1("start", vector<string> { "id","id_suffix" });
+  Production production2("start", vector<string> { "expr" });
+  Production production3("id_suffix", vector<string> { "=", "assignee" });
+  Production production4("id_suffix", vector<string> { "array" });
+  Production production5("assignee", vector<string> { "array" });
+  Production production6("assignee", vector<string> { "expr" });
+  Production production1_x("term", vector<string> { "term","expr'" });
+  Production production2_x("term'", vector<string> { "+","term","expr'" });
+  Production production3_x("term'", vector<string> { "-","term","expr'" });
+  Production production4_x("term'", vector<string> {});
+  Production production5_x("term", vector<string> { "factor","term'" });
+  Production production6_x("term'", vector<string> { "*","factor","term'" });
+  Production production7_x("term'", vector<string> {"/", "factor", "term'" });
+  Production production8_x("term'", vector<string> {});
+  Production production9_x("factor", vector<string> { "number" });
+  Production production10_x("factor", vector<string> { "(","expr",")" });
+  Production production11_x("array", vector<string> { "[","number","rest","]" });
   Production production12_x("rest", vector<string> {",", "number", "rest" });
   Production production13_x("rest", vector<string> {});
 
@@ -120,22 +121,22 @@ ParseTable construct_parse_table()
   parse_table.add_rule("assignee", "number", production6);
   parse_table.add_rule("assignee", "[", production5);
   parse_table.add_rule("assignee", "(", production6);
-  parse_table.add_rule("E", "number", production1_x);
-  parse_table.add_rule("E", "(", production1_x);
-  parse_table.add_rule("E'", "+", production2_x);
-  parse_table.add_rule("E'", "-", production3_x);
-  parse_table.add_rule("E'", ")", production4_x);
-  parse_table.add_rule("E'", "$", production4_x);
-  parse_table.add_rule("T", "number", production5_x);
-  parse_table.add_rule("T", "(", production5_x);
-  parse_table.add_rule("T'", "+", production8_x);
-  parse_table.add_rule("T'", "-", production8_x);
-  parse_table.add_rule("T'", "*", production6_x);
-  parse_table.add_rule("T'", "/", production7_x);
-  parse_table.add_rule("T'", ")", production8_x);
-  parse_table.add_rule("T'", "$", production8_x);
-  parse_table.add_rule("F", "number", production9_x);
-  parse_table.add_rule("F", "(", production10_x);
+  parse_table.add_rule("expr", "number", production1_x);
+  parse_table.add_rule("expr", "(", production1_x);
+  parse_table.add_rule("expr'", "+", production2_x);
+  parse_table.add_rule("expr'", "-", production3_x);
+  parse_table.add_rule("expr'", ")", production4_x);
+  parse_table.add_rule("expr'", "$", production4_x);
+  parse_table.add_rule("term", "number", production5_x);
+  parse_table.add_rule("term", "(", production5_x);
+  parse_table.add_rule("term'", "+", production8_x);
+  parse_table.add_rule("term'", "-", production8_x);
+  parse_table.add_rule("term'", "*", production6_x);
+  parse_table.add_rule("term'", "/", production7_x);
+  parse_table.add_rule("term'", ")", production8_x);
+  parse_table.add_rule("term'", "$", production8_x);
+  parse_table.add_rule("factor", "number", production9_x);
+  parse_table.add_rule("factor", "(", production10_x);
   parse_table.add_rule("array", "[", production11_x);
   parse_table.add_rule("rest", ",", production12_x);
   parse_table.add_rule("rest", "]", production13_x);

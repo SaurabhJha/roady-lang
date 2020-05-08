@@ -13,7 +13,7 @@ int main()
     string raw_input = "";
     getline(cin, raw_input);
     string formatted_input = remove_whitespace(raw_input);
-    tokenize(formatted_input);
+    parse(tokenize(formatted_input));
     cout << "\n";
   }
 }
