@@ -77,6 +77,10 @@ string map_token_type_to_terminal(TokenType token_type)
       return "(";
     case (TokenType::close_paran):
       return ")";
+    case (TokenType::equals):
+      return "=";
+    case (TokenType::double_equals):
+      return "==";
     case (TokenType::invalid):
       return "";
   }

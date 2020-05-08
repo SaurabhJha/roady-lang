@@ -10,10 +10,10 @@ int main()
 {
   while (true) {
     cout << "> ";
-    string raw_input;
+    string raw_input = "";
     getline(cin, raw_input);
     string formatted_input = remove_whitespace(raw_input);
-    parse(tokenize(formatted_input));
+    tokenize(formatted_input);
     cout << "\n";
   }
 }

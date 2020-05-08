@@ -84,6 +84,16 @@ FiniteAutomaton construct_automaton_for_number()
   return FiniteAutomaton(initial_state, final_states, table);
 }
 
+FiniteAutomaton construct_automaton_for_double_equals()
+{
+  TransitionTable table(3);
+  table.add_transition(1, 2, "=");
+  table.add_transition(2, 3, "=");
+  int initial_state = 1;
+  unordered_set<int> final_states = {3};
+  return FiniteAutomaton(initial_state, final_states, table);
+}
+
 FiniteAutomaton construct_automaton_for_special_character(string special_character)
 {
   TransitionTable table(2);
@@ -130,6 +140,12 @@ void Token::print()
     case (TokenType::close_paran):
       token_type_string = ")";
       break;
+    case (TokenType::equals):
+      token_type_string = "=";
+      break;
+    case (TokenType::double_equals):
+      token_type_string = "==";
+      break;
     case (TokenType::invalid):
       token_type_string = "invalid";
       break;
@@ -158,23 +174,32 @@ Token get_next_token(string input, int start_index)
 {
   vector<FiniteAutomaton> vector_of_automata = { construct_automaton_for_number(),
                                                  construct_automaton_for_id(),
+                                                 construct_automaton_for_double_equals(),
                                                  construct_automaton_for_special_character("+"),
                                                  construct_automaton_for_special_character("*"),
+                                                 construct_automaton_for_special_character("-"),
+                                                 construct_automaton_for_special_character("/"),
                                                  construct_automaton_for_special_character("["),
                                                  construct_automaton_for_special_character("]"),
                                                  construct_automaton_for_special_character("("),
                                                  construct_automaton_for_special_character(")"),
-                                                 construct_automaton_for_special_character(",") };
-  // Used to correlate automata with token types.
+                                                 construct_automaton_for_special_character(","),
+                                                 construct_automaton_for_special_character("=") };
+  // Used to correlate automata with token types. The order in `vector_of_token_types` must
+  // match with `vector_of_automata`.
   vector<TokenType> vector_of_token_types = { TokenType::number,
                                               TokenType ::id,
+                                              TokenType::double_equals,
                                               TokenType::plus,
                                               TokenType::star,
+                                              TokenType::minus,
+                                              TokenType::slash,
                                               TokenType::open_bracket,
                                               TokenType::close_bracket,
                                               TokenType::open_paran,
                                               TokenType::close_paran,
-                                              TokenType::comma };
+                                              TokenType::comma,
+                                              TokenType::equals };
 
   TokenType next_token_type = TokenType::invalid;
   int max_next_token_index = start_index - 1;

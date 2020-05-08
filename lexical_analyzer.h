@@ -21,6 +21,7 @@ using namespace std;
 class TransitionTableRow {
  private:
   unordered_map<string, int> row_;
+
  public:
   TransitionTableRow() = default;
   ~TransitionTableRow() = default;
@@ -74,6 +75,7 @@ class FiniteAutomaton {
   unordered_set<int> final_states_;
   TransitionTable table_;
   int current_state_;
+
  public:
   FiniteAutomaton(int initial_state, unordered_set<int> final_states, TransitionTable table)
     :initial_state_{initial_state}, current_state_{initial_state}, final_states_{final_states}, table_{table} {}
@@ -89,14 +91,21 @@ class FiniteAutomaton {
  * These are the token types we support. "invalid" token is for unrecognizable tokens.
  */
 enum class TokenType { invalid,id,number,plus,minus,star,slash,open_bracket,
-                       close_bracket,open_paran,close_paran,comma};
+                       close_bracket,open_paran,close_paran,comma,equals,double_equals };
 
+/**
+ * A token consists of
+ * 1) a token type.
+ * 2) the associated lexeme that matched.
+ * 3) the index right after the current lexeme
+ */
 class Token
 {
  private:
   TokenType token_type_;
   string lexeme_;
   int next_token_index_;
+
  public:
   Token(TokenType token_type, string lexeme, int next_token_index)
       :token_type_{token_type}, lexeme_{lexeme}, next_token_index_{next_token_index} {}
@@ -109,6 +118,7 @@ class Token
 
 FiniteAutomaton construct_automaton_for_id();
 FiniteAutomaton construct_automaton_for_number();
+FiniteAutomaton construct_automaton_for_double_equals();
 FiniteAutomaton construct_automaton_for_special_character(string special_character);
 
 string remove_whitespace(string input);
