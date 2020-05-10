@@ -27,6 +27,11 @@ TransitionTableRow TransitionTable::operator[](int state)
   return table_[state];
 }
 
+void FiniteAutomaton::move(string input)
+{
+  current_state_ = table_[current_state_][input];
+}
+
 bool FiniteAutomaton::is_dead()
 {
   return current_state_ == 0;
@@ -37,9 +42,47 @@ bool FiniteAutomaton::has_accepted()
   return !(final_states_.find(current_state_) == final_states_.end());
 }
 
-void FiniteAutomaton::move(string input)
+void FiniteAutomaton::reset()
 {
-  current_state_ = table_[current_state_][input];
+  current_state_ = initial_state_;
+}
+
+/**
+ * Executes the automaton on an input string, starting from a start_index. Returns the substring
+ * matched. Returns empty string if the input is not recognised by the automaton.
+ * @param input_string
+ * @param start_index
+ * @return
+ */
+string FiniteAutomaton::execute_on_input_string(string input_string, int start_index)
+{
+  // First of all, reset the automaton state.
+  reset();
+  auto accepted = false;
+  // We start from the index before start_index because the minimum non-empty string is a length 1 string when
+  // index_at_accept == start_index.
+  auto index_at_accept = start_index - 1;
+
+  // Start from start_index and continue on with next characters till either
+  // 1. the automaton is dead.
+  // 2. the string is exhausted.
+  for (int current_index = start_index; current_index < input_string.length(); ++current_index) {
+    string current_input(1, input_string[current_index]);
+    move(current_input);
+    if (is_dead()) {
+      break;
+    }
+    if (has_accepted()) {
+      accepted = true;
+      index_at_accept = current_index;
+    }
+  }
+
+  if (accepted) {
+    auto length_of_accepted_string = index_at_accept - start_index + 1;
+    return input_string.substr(start_index, length_of_accepted_string);
+  }
+  return "";
 }
 
 FiniteAutomaton construct_automaton_for_id()
@@ -134,10 +177,10 @@ void Token::print()
     case (TokenType::close_bracket):
       token_type_string = "]";
       break;
-    case (TokenType::open_paran):
+    case (TokenType::open_paren):
       token_type_string = "(";
       break;
-    case (TokenType::close_paran):
+    case (TokenType::close_paren):
       token_type_string = ")";
       break;
     case (TokenType::equals):
@@ -164,88 +207,53 @@ string remove_whitespace(string input)
 }
 
 /**
- * @param input
- * @param start_index
- * @return next_token
- * Tries all automatons in turn and gets the token with the longest lexeme;
- * its an implementation of maximal munch policy.
+ * Starts from current_index_ in raw_input and gets the next token. It does so by trying all
+ * automatons and selecting the token corresponding to the maximum input matched; its an
+ * implementation of maximal-munch policy.
  */
-Token get_next_token(string input, int start_index)
-{
-  vector<FiniteAutomaton> vector_of_automata = { construct_automaton_for_number(),
-                                                 construct_automaton_for_id(),
-                                                 construct_automaton_for_double_equals(),
-                                                 construct_automaton_for_special_character("+"),
-                                                 construct_automaton_for_special_character("*"),
-                                                 construct_automaton_for_special_character("-"),
-                                                 construct_automaton_for_special_character("/"),
-                                                 construct_automaton_for_special_character("["),
-                                                 construct_automaton_for_special_character("]"),
-                                                 construct_automaton_for_special_character("("),
-                                                 construct_automaton_for_special_character(")"),
-                                                 construct_automaton_for_special_character(","),
-                                                 construct_automaton_for_special_character("=") };
-  // Used to correlate automata with token types. The order in `vector_of_token_types` must
-  // match with `vector_of_automata`.
-  vector<TokenType> vector_of_token_types = { TokenType::number,
-                                              TokenType::id,
-                                              TokenType::double_equals,
-                                              TokenType::plus,
-                                              TokenType::star,
-                                              TokenType::minus,
-                                              TokenType::slash,
-                                              TokenType::open_bracket,
-                                              TokenType::close_bracket,
-                                              TokenType::open_paran,
-                                              TokenType::close_paran,
-                                              TokenType::comma,
-                                              TokenType::equals };
+Token Tokenizer::get_next_token() {
+  vector<TokenTypeAutomatonPair> token_automaton_pairs;
+  token_automaton_pairs.emplace_back(TokenType::id, construct_automaton_for_id());
+  token_automaton_pairs.emplace_back(TokenType::number, construct_automaton_for_number());
+  token_automaton_pairs.emplace_back(TokenType::plus, construct_automaton_for_special_character("+"));
+  token_automaton_pairs.emplace_back(TokenType::minus, construct_automaton_for_special_character("-"));
+  token_automaton_pairs.emplace_back(TokenType::star, construct_automaton_for_special_character("*"));
+  token_automaton_pairs.emplace_back(TokenType::slash, construct_automaton_for_special_character("/"));
+  token_automaton_pairs.emplace_back(TokenType::open_bracket, construct_automaton_for_special_character("["));
+  token_automaton_pairs.emplace_back(TokenType::close_bracket, construct_automaton_for_special_character("]"));
+  token_automaton_pairs.emplace_back(TokenType::open_paren, construct_automaton_for_special_character("("));
+  token_automaton_pairs.emplace_back(TokenType::close_paren, construct_automaton_for_special_character(")"));
+  token_automaton_pairs.emplace_back(TokenType::comma, construct_automaton_for_special_character(","));
+  token_automaton_pairs.emplace_back(TokenType::equals, construct_automaton_for_special_character("="));
+  token_automaton_pairs.emplace_back(TokenType::double_equals, construct_automaton_for_double_equals());
 
-
-  TokenType next_token_type;
-  int max_next_token_index = start_index - 1;
-  for (int i=0; i<vector_of_automata.size(); ++i) {
-    FiniteAutomaton automaton = vector_of_automata[i];
-    int next_lexeme_end = start_index - 1;
-    for (int current_index = start_index; current_index < input.length(); ++current_index) {
-      string current_input(1, input[current_index]);
-      automaton.move(current_input);
-
-      if (automaton.is_dead()) {
-        break;
-      }
-      if (automaton.has_accepted()) {
-        next_lexeme_end = current_index;
-      }
-    }
-
-    if (next_lexeme_end > max_next_token_index) {
-      max_next_token_index = next_lexeme_end;
-      next_token_type = vector_of_token_types[i];
+  string lexeme;
+  TokenType token_type = TokenType::invalid;
+  for (auto token_automaton_pair : token_automaton_pairs) {
+    auto automaton = token_automaton_pair.get_automaton();
+    string lexeme_candidate = automaton.execute_on_input_string(raw_input_, current_index_);
+    if (lexeme_candidate.length() > lexeme.length()) {
+      lexeme = lexeme_candidate;
+      token_type = token_automaton_pair.get_token_type();
     }
   }
 
-  if (max_next_token_index == start_index - 1) {
-    Token next_token(TokenType::invalid, "", -1);
-    return next_token;
-  } else {
-    Token next_token(next_token_type,
-                     input.substr(start_index, max_next_token_index - start_index + 1),
-                     max_next_token_index);
-    return next_token;
-  }
+  // Update tokenizer state to set the correct input pointer.
+  if (token_type == TokenType::invalid)
+    // Set the state so that the tokenizer is aborted.
+    current_index_ = raw_input_.length();
+  else
+    // Tokenizer can continue
+    current_index_ += lexeme.length();
+
+  Token token(token_type, lexeme);
+  return token;
 }
 
-vector<Token> tokenize(string input)
+/**
+ * Checks whether there is any more input left in this tokenizer.
+ */
+bool Tokenizer::is_there_more_input()
 {
-  vector<Token> tokens;
-  int index = 0;
-  while (index < input.size()) {
-    Token next_token = get_next_token(input, index);
-    tokens.push_back(next_token);
-    if (next_token.get_next_token_index() == index - 1)
-      break;
-    index = next_token.get_next_token_index() + 1;
-  }
-  return tokens;
+  return current_index_ < raw_input_.length();
 }

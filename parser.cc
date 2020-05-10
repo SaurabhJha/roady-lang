@@ -73,9 +73,9 @@ string map_token_type_to_terminal(TokenType token_type)
       return "[";
     case (TokenType::close_bracket):
       return "]";
-    case (TokenType::open_paran):
+    case (TokenType::open_paren):
       return "(";
-    case (TokenType::close_paran):
+    case (TokenType::close_paren):
       return ")";
     case (TokenType::equals):
       return "=";

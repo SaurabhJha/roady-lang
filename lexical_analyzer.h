@@ -39,7 +39,11 @@ class TransitionTableRow {
  *  3 | 4 | 3 |
  *  4 | 4 | 3 |
  *
- *  What we are looking for is something where the API should look like this
+ * It is composed of transition table rows. Specifically, each state has an
+ * associated a transition table row which determines next states on different
+ * inputs.
+ *
+ * What we are looking for is something where the API should look like this
  *       table[state][next_input] = next_state
  */
 class TransitionTable {
@@ -51,6 +55,7 @@ class TransitionTable {
   TransitionTable(int states)
     :number_of_states_{states}
   {
+    // Create an empty row for each state.
     for (auto state=1; state<=number_of_states_; ++state) {
       TransitionTableRow current_row;
       table_[state] = current_row;
@@ -84,13 +89,16 @@ class FiniteAutomaton {
   void move(string input);
   bool is_dead();
   bool has_accepted();
+  void reset();
+  string execute_on_input_string(string input_string, int start_index);
 };
 
 /**
  * These are the token types we support. "invalid" token is for unrecognizable tokens.
  */
 enum class TokenType { invalid,id,number,plus,minus,star,slash,open_bracket,
-                       close_bracket,open_paran,close_paran,comma,equals,double_equals };
+                       close_bracket,open_paren,close_paren,comma,equals,
+                       double_equals };
 
 /**
  * A token consists of
@@ -103,16 +111,48 @@ class Token
  private:
   TokenType token_type_;
   string lexeme_;
-  int next_token_index_;
 
  public:
-  Token(TokenType token_type, string lexeme, int next_token_index)
-      :token_type_{token_type}, lexeme_{lexeme}, next_token_index_{next_token_index} {}
+  Token(TokenType token_type, string lexeme)
+      :token_type_{token_type}, lexeme_{lexeme} {}
   ~Token() = default;
 
   TokenType get_token_type() { return token_type_; };
-  int get_next_token_index() { return next_token_index_; }
   void print();
+};
+
+/**
+ * Data structure to represent a pair of TokenType and automaton. This is
+ * used to make TokenType-Automaton associations.
+ */
+class TokenTypeAutomatonPair
+{
+ private:
+  TokenType token_type_;
+  FiniteAutomaton automaton_;
+
+ public:
+  TokenTypeAutomatonPair(TokenType token_type, const FiniteAutomaton& automaton)
+    :token_type_{token_type}, automaton_{automaton} {}
+  ~TokenTypeAutomatonPair() = default;
+
+  TokenType get_token_type() { return token_type_; }
+  FiniteAutomaton get_automaton() { return automaton_; }
+};
+
+class Tokenizer
+{
+ private:
+  string raw_input_;
+  int current_index_;
+
+ public:
+  Tokenizer(string raw_input, int current_index=0)
+    :current_index_{current_index}, raw_input_{std::move(raw_input)} {}
+  ~Tokenizer() = default;
+
+  Token get_next_token();
+  bool is_there_more_input();
 };
 
 FiniteAutomaton construct_automaton_for_id();
@@ -121,7 +161,5 @@ FiniteAutomaton construct_automaton_for_double_equals();
 FiniteAutomaton construct_automaton_for_special_character(string special_character);
 
 string remove_whitespace(string input);
-Token get_next_token(string input, int start_index);
-vector<Token> tokenize(string input);
 
 #endif // ROADY_LANG_LEXICAL_ANALYZER_H_
