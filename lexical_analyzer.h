@@ -43,7 +43,7 @@ class TransitionTableRow {
  * associated a transition table row which determines next states on different
  * inputs.
  *
- * What we are looking for is something where the API should look like this
+ * What we are looking for is something where the API would look like this
  *       table[state][next_input] = next_state
  */
 class TransitionTable {

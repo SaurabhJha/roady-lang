@@ -94,8 +94,6 @@ class ParseTable {
 
 string map_token_type_to_terminal(TokenType token_type);
 
-ParseTable construct_parse_table();
-
 vector<Production> parse(vector<Token> tokens);
 
 #endif //ROADY_LANG_PARSER_H_

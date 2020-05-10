@@ -86,70 +86,67 @@ string map_token_type_to_terminal(TokenType token_type)
   }
 }
 
-ParseTable construct_parse_table()
+/**
+ * Construct the top-down parse table for the following arithmetic expressions grammar.
+ *
+ *   expr -> term expr'
+ *   expr' -> + term expr' | - term expr' | epsilon
+ *   term -> factor term'
+ *   term' -> * factor term' | / factor term' | epsilon
+ *   factor -> number | id | ( expr )
+ */
+ParseTable construct_top_down_parse_table()
 {
-  unordered_set<string> non_terminals = { "start","expr","expr'","term","term'","factor","array","rest","id_suffix",
-                                          "assignee" };
-  unordered_set<string> terminals = { "id","number","+","-","*","/","[","]","(",")",",","$","=","==" };
+  unordered_set<string> non_terminals = {"expr", "expr'", "term", "term'", "factor"};
+  unordered_set<string> terminals = {"+", "-", "*", "/", "(", ")", "number", "id", "$"};
 
-  Production production1("start", vector<string> { "id","id_suffix" });
-  Production production2("start", vector<string> { "expr" });
-  Production production3("id_suffix", vector<string> { "=", "assignee" });
-  Production production4("id_suffix", vector<string> { "array" });
-  Production production5("assignee", vector<string> { "array" });
-  Production production6("assignee", vector<string> { "expr" });
-  Production production1_x("term", vector<string> { "term","expr'" });
-  Production production2_x("term'", vector<string> { "+","term","expr'" });
-  Production production3_x("term'", vector<string> { "-","term","expr'" });
-  Production production4_x("term'", vector<string> {});
-  Production production5_x("term", vector<string> { "factor","term'" });
-  Production production6_x("term'", vector<string> { "*","factor","term'" });
-  Production production7_x("term'", vector<string> {"/", "factor", "term'" });
-  Production production8_x("term'", vector<string> {});
-  Production production9_x("factor", vector<string> { "number" });
-  Production production10_x("factor", vector<string> { "(","expr",")" });
-  Production production11_x("array", vector<string> { "[","number","rest","]" });
-  Production production12_x("rest", vector<string> {",", "number", "rest" });
-  Production production13_x("rest", vector<string> {});
+  Production expr_production = Production("expr", vector<string> {"term", "expr'"});
+  Production expr_prime_production_plus("expr'", vector<string> {"+", "term", "expr'"});
+  Production expr_prime_production_minus("expr'", vector<string> {"-", "term", "expr'"});
+  Production expr_prime_production_empty("expr'", vector<string> {});
+
+  Production term_production = Production("term", vector<string> {"factor", "term'"});
+  Production term_prime_production_star = Production("term'", vector<string> {"*", "factor", "term'"});
+  Production term_prime_production_slash = Production("term'", vector<string> {"/", "factor", "term'"});
+  Production term_prime_production_empty = Production("term'", vector<string> {});
+
+  Production factor_production_number = Production("factor", vector<string> {"number"});
+  Production factor_production_id = Production("factor", vector<string> {"id"});
+  Production factor_production_paren = Production("factor", vector<string> {"(", "expr", ")"});
 
   ParseTable parse_table(non_terminals, terminals);
-  parse_table.add_rule("start", "id", production1);
-  parse_table.add_rule("start", "number", production2);
-  parse_table.add_rule("start", "(", production2);
-  parse_table.add_rule("id_suffix", "=", production3);
-  parse_table.add_rule("id_suffix", "[", production4);
-  parse_table.add_rule("assignee", "number", production6);
-  parse_table.add_rule("assignee", "[", production5);
-  parse_table.add_rule("assignee", "(", production6);
-  parse_table.add_rule("expr", "number", production1_x);
-  parse_table.add_rule("expr", "(", production1_x);
-  parse_table.add_rule("expr'", "+", production2_x);
-  parse_table.add_rule("expr'", "-", production3_x);
-  parse_table.add_rule("expr'", ")", production4_x);
-  parse_table.add_rule("expr'", "$", production4_x);
-  parse_table.add_rule("term", "number", production5_x);
-  parse_table.add_rule("term", "(", production5_x);
-  parse_table.add_rule("term'", "+", production8_x);
-  parse_table.add_rule("term'", "-", production8_x);
-  parse_table.add_rule("term'", "*", production6_x);
-  parse_table.add_rule("term'", "/", production7_x);
-  parse_table.add_rule("term'", ")", production8_x);
-  parse_table.add_rule("term'", "$", production8_x);
-  parse_table.add_rule("factor", "number", production9_x);
-  parse_table.add_rule("factor", "(", production10_x);
-  parse_table.add_rule("array", "[", production11_x);
-  parse_table.add_rule("rest", ",", production12_x);
-  parse_table.add_rule("rest", "]", production13_x);
+
+  parse_table.add_rule("expr", "number", expr_production);
+  parse_table.add_rule("expr", "(", expr_production);
+
+  parse_table.add_rule("expr'", "+", expr_prime_production_plus);
+  parse_table.add_rule("expr'", "-", expr_prime_production_minus);
+  parse_table.add_rule("expr'", ")", expr_prime_production_empty);
+  parse_table.add_rule("expr'", "$", expr_prime_production_empty);
+
+  parse_table.add_rule("term", "number", term_production);
+  parse_table.add_rule("term", "(", term_production);
+
+  parse_table.add_rule("term'", "+", term_prime_production_empty);
+  parse_table.add_rule("term'", "-", term_prime_production_empty);
+  parse_table.add_rule("term'", "*", term_prime_production_star);
+  parse_table.add_rule("term'", "/", term_prime_production_slash);
+  parse_table.add_rule("term'", ")", term_prime_production_empty);
+  parse_table.add_rule("term'", "$", term_prime_production_empty);
+
+  parse_table.add_rule("factor", "number", factor_production_number);
+  parse_table.add_rule("factor", "id", factor_production_id);
+  parse_table.add_rule("factor", "(", factor_production_paren);
 
   return parse_table;
 }
 
 vector<Production> parse(vector<Token> tokens)
 {
-  ParseTable parse_table = construct_parse_table();
+  auto parse_table = construct_top_down_parse_table();
 
   stack<string> parse_stack;
-  parse_stack.push("start");
+  parse_stack.push("expr");
 
   int token_index = 0;
   vector<Production> productions;
@@ -183,5 +180,23 @@ vector<Production> parse(vector<Token> tokens)
       return empty_productions;
     }
   }
+
+  while (token_index == tokens.size() && !(parse_stack.empty())) {
+    string top_stack_symbol = parse_stack.top();
+    cout << "Top stack symbol: " << top_stack_symbol << ", next token: " << "$";
+    Production production = parse_table[top_stack_symbol]["$"];
+    productions.push_back(production);
+    cout << ", rule applied: ";
+    production.print();
+    cout << "\n";
+    parse_stack.pop();
+  }
+
+  if (token_index == tokens.size() && parse_stack.empty()) {
+    cout << "successful parse\n";
+  } else {
+    cout << "unsuccessful parse\n";
+  }
+
   return productions;
 }

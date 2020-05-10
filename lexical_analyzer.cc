@@ -88,11 +88,11 @@ string FiniteAutomaton::execute_on_input_string(string input_string, int start_i
 FiniteAutomaton construct_automaton_for_id()
 {
   TransitionTable table(4);
-  unordered_set<string> alphabetical_characters = { "a","b","c","d","e","f","g","h","i","j","k","l","m",
-                                                    "n","o","p","q","r","s","t","u","v","w","x","y","z",
-                                                    "A","B","C","D","E","F","G","H","I","J","K","L","M",
-                                                    "N","O","P","Q","R","S","T","U","V","W","X","Y","Z" };
-  unordered_set<string> numeric_characters = { "0","1","2","3","4","5","6","7","8","9","0" };
+  unordered_set<string> alphabetical_characters = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
+                                                    "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+                                                    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+                                                    "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+  unordered_set<string> numeric_characters = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
   for (string letter : alphabetical_characters) {
     table.add_transition(1, 2, letter);
@@ -114,7 +114,7 @@ FiniteAutomaton construct_automaton_for_id()
 FiniteAutomaton construct_automaton_for_number()
 {
   TransitionTable table(3);
-  unordered_set<string> numeric_characters = { "0","1","2","3","4","5","6","7","8","9","0" };
+  unordered_set<string> numeric_characters = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
 
   for (string digit : numeric_characters) {
     table.add_transition(1, 2, digit);
