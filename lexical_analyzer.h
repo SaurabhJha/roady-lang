@@ -141,6 +141,10 @@ class TokenTypeAutomatonPair
   FiniteAutomaton get_automaton() { return automaton_; }
 };
 
+/**
+ * A tokenizer implementation. It contains all the state necessary to generate tokens one-by-one
+ * from a text string.
+ */
 class Tokenizer
 {
  private:

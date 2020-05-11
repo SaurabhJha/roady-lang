@@ -13,34 +13,34 @@ vector<string> Production::get_right_side()
   return right_side_;
 }
 
-void ParseTableRow::add_terminal_production_pair(string terminal, Production production)
+void TopDownParsingTableRow::add_terminal_production_pair(string terminal, Production production)
 {
   row_[terminal] = production;
 }
 
-Production ParseTableRow::operator[](string terminal)
+Production TopDownParsingTableRow::operator[](string terminal)
 {
   return row_[terminal];
 }
 
-void ParseTable::add_rule(string non_terminal, string terminal, Production production)
+void TopDownParsingTable::add_rule(string non_terminal, string terminal, Production production)
 {
-  ParseTableRow row = table_[non_terminal];
+  TopDownParsingTableRow row = table_[non_terminal];
   row.add_terminal_production_pair(terminal, production);
   table_[non_terminal] = row;
 }
 
-bool ParseTable::is_non_terminal(string symbol)
+bool TopDownParsingTable::is_non_terminal(string symbol)
 {
   return !(non_terminals_.find(symbol) == non_terminals_.end());
 }
 
-bool ParseTable::is_terminal(string symbol)
+bool TopDownParsingTable::is_terminal(string symbol)
 {
   return !(terminals_.find(symbol) == terminals_.end());
 }
 
-ParseTableRow ParseTable::operator[](string non_terminal)
+TopDownParsingTableRow TopDownParsingTable::operator[](string non_terminal)
 {
   return table_[non_terminal];
 }
@@ -99,7 +99,7 @@ string map_token_type_to_terminal(TokenType token_type)
  *     expr' |
  *     + term expr' |
  */
-void Parser::apply_production(Production production)
+void TopDownParser::apply_production(Production production)
 {
   auto production_right_side = production.get_right_side();
   stack_.pop();
@@ -118,7 +118,7 @@ void Parser::apply_production(Production production)
  *   term' -> * factor term' | / factor term' | epsilon
  *   factor -> number | id | ( expr )
  */
-ParseTable Parser::construct_top_down_parse_table()
+TopDownParsingTable TopDownParser::construct_top_down_parse_table()
 {
   unordered_set<string> non_terminals = {"expr", "expr'", "term", "term'", "factor"};
   unordered_set<string> terminals = {"+", "-", "*", "/", "(", ")", "number", "id", "$"};
@@ -137,7 +137,7 @@ ParseTable Parser::construct_top_down_parse_table()
   Production factor_production_id = Production("factor", vector<string> {"id"});
   Production factor_production_paren = Production("factor", vector<string> {"(", "expr", ")"});
 
-  ParseTable parse_table(non_terminals, terminals);
+  TopDownParsingTable parse_table(non_terminals, terminals);
 
   parse_table.add_rule("expr", "number", expr_production);
   parse_table.add_rule("expr", "(", expr_production);
@@ -164,7 +164,7 @@ ParseTable Parser::construct_top_down_parse_table()
   return parse_table;
 }
 
-void Parser::parse_next_token(Token token)
+void TopDownParser::parse_next_token(Token token)
 {
   auto incoming_terminal = map_token_type_to_terminal(token.get_token_type());
   auto top_stack_symbol = stack_.top();
@@ -176,8 +176,6 @@ void Parser::parse_next_token(Token token)
       break;
     }
     auto next_production = parse_table_[top_stack_symbol][incoming_terminal];
-    next_production.print();
-    cout << "\n";
     apply_production(next_production);
     productions_applied_.push_back(next_production);
     top_stack_symbol = stack_.top();
@@ -191,7 +189,13 @@ void Parser::parse_next_token(Token token)
   }
 }
 
-bool Parser::has_failed()
+bool TopDownParser::has_failed()
 {
   return has_failed_;
 }
+
+vector<Production> TopDownParser::get_productions_applied()
+{
+  return productions_applied_;
+}
+

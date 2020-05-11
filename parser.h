@@ -38,7 +38,7 @@ class Production {
 };
 
 /**
- * Data structure to represent a parse table row like this
+ * Data structure to represent an LL(1) parsing table row like this
  *          |term1|term2|term3|term4|
  * ---------|-----|-----|-----|-----|
  * nonterm1 |prod1|prod2|prod3|prod4|
@@ -48,20 +48,20 @@ class Production {
  * are productions. So the above row would look like this
  *    { term1: prod1, term2: prod2, term3: prod3, term4: prod4 }
  */
-class ParseTableRow {
+class TopDownParsingTableRow {
  private:
   unordered_map<string, Production> row_;
 
  public:
-  ParseTableRow() = default;
-  ~ParseTableRow() = default;
+  TopDownParsingTableRow() = default;
+  ~TopDownParsingTableRow() = default;
 
   void add_terminal_production_pair(string terminal, Production production);
   Production operator[](string terminal);
 };
 
 /**
- * Data structure to represent a parse table like this
+ * Data structure to represent an LL(1) parsing table like this
  *          |term1|term2|term3|term4|
  * ---------|-----|-----|-----|-----|
  * nonterm1 |prod1|     |prod3|     |
@@ -70,44 +70,48 @@ class ParseTableRow {
  * What we are looking for is something where the API should look like this
  *     parse_tabletable[nonterm][term] = production
  */
-class ParseTable {
+class TopDownParsingTable {
  private:
   unordered_set<string> non_terminals_;
   unordered_set<string> terminals_;
-  unordered_map<string, ParseTableRow> table_;
+  unordered_map<string, TopDownParsingTableRow> table_;
 
  public:
-  ParseTable() = default;
-  ParseTable(unordered_set<string> non_terminals, unordered_set<string> terminals)
+  TopDownParsingTable() = default;
+  TopDownParsingTable(unordered_set<string> non_terminals, unordered_set<string> terminals)
     :non_terminals_{non_terminals}, terminals_{terminals}
   {
     for (string non_terminal : non_terminals_) {
-      ParseTableRow row;
+      TopDownParsingTableRow row;
       table_[non_terminal] = row;
     }
   }
-  ~ParseTable() = default;
+  ~TopDownParsingTable() = default;
 
   void add_rule(string non_terminal, string terminal, Production production);
   bool is_non_terminal(string symbol);
   bool is_terminal(string symbol);
-  ParseTableRow operator[](string non_terminal);
+  TopDownParsingTableRow operator[](string non_terminal);
 };
 
 string map_token_type_to_terminal(TokenType token_type);
 
-class Parser {
+/**
+ * An LL(1) parser implementation. It contains all the state necessary to incrementally process tokens
+ * output by the tokenizer.
+ */
+class TopDownParser {
  private:
   stack<string> stack_;
-  ParseTable parse_table_;
+  TopDownParsingTable parse_table_;
   vector<Production> productions_applied_;
   bool has_failed_;
 
   void apply_production(Production production);
-  ParseTable construct_top_down_parse_table();
+  TopDownParsingTable construct_top_down_parse_table();
 
  public:
-  Parser()
+  TopDownParser()
   {
     parse_table_ = construct_top_down_parse_table();
     // Initialize the stack with start symbol of the grammar and end of the input symbol '$'
@@ -116,11 +120,11 @@ class Parser {
     productions_applied_ = {};
     has_failed_ = false;
   }
-  ~Parser() = default;
+  ~TopDownParser() = default;
 
   void parse_next_token(Token token);
   bool has_failed();
+  vector<Production> get_productions_applied();
 };
-vector<Production> parse(vector<Token> tokens);
 
 #endif //ROADY_LANG_PARSER_H_

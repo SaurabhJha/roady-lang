@@ -15,7 +15,7 @@ int main()
     string processed_string = remove_whitespace(input_string);
 
     Tokenizer tokenizer(processed_string, 0);
-    Parser parser;
+    TopDownParser parser;
     while (tokenizer.is_there_more_input()) {
       auto next_token = tokenizer.get_next_token();
       parser.parse_next_token(next_token);
@@ -29,6 +29,10 @@ int main()
     if (parser.has_failed()) {
       cout << "Unsuccesful parse\n";
     } else {
+      for (auto production : parser.get_productions_applied()) {
+        production.print();
+        cout << "\n";
+      }
       cout << "Successful parse\n";
     }
     cout << "\n";
