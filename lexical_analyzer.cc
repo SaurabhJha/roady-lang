@@ -239,9 +239,11 @@ Token Tokenizer::get_next_token() {
   }
 
   // Update tokenizer state to set the correct input pointer.
-  if (token_type == TokenType::invalid)
-    // Set the state so that the tokenizer is aborted.
+  if (token_type == TokenType::invalid) {
+    // Set the state so that the tokenizer is aborted. Also set the lexeme at the current input.
+    lexeme = raw_input_[current_index_];
     current_index_ = raw_input_.length();
+  }
   else
     // Tokenizer can continue
     current_index_ += lexeme.length();

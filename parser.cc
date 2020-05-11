@@ -8,7 +8,7 @@
 #include "./parser.h"
 using namespace std;
 
-vector<string> Production::apply()
+vector<string> Production::get_right_side()
 {
   return right_side_;
 }
@@ -81,10 +81,33 @@ string map_token_type_to_terminal(TokenType token_type)
       return "=";
     case (TokenType::double_equals):
       return "==";
+    case (TokenType::dollar):
+      return "$";
     case (TokenType::invalid):
       return "";
+
   }
 }
+
+/**
+ * Apply a production by popping the top grammar symbol and pushing in the right side of the production.
+ * The right side is pushed in the order such that the rightmost symbol appear at the bottom and the
+ * leftmost symbol at the top, in accordance with requirement of LL(1) parser.
+ *
+ * Here's an example. Suppose the production is "expr' -> + term expr'". The successive stack states would
+ * look like this
+ *     expr' |
+ *     + term expr' |
+ */
+void Parser::apply_production(Production production)
+{
+  auto production_right_side = production.get_right_side();
+  stack_.pop();
+  for (auto next_non_terminal = production_right_side.rbegin(); next_non_terminal != production_right_side.rend();
+        ++next_non_terminal)
+    stack_.push(*next_non_terminal);
+}
+
 
 /**
  * Construct the top-down parse table for the following arithmetic expressions grammar.
@@ -95,7 +118,7 @@ string map_token_type_to_terminal(TokenType token_type)
  *   term' -> * factor term' | / factor term' | epsilon
  *   factor -> number | id | ( expr )
  */
-ParseTable construct_top_down_parse_table()
+ParseTable Parser::construct_top_down_parse_table()
 {
   unordered_set<string> non_terminals = {"expr", "expr'", "term", "term'", "factor"};
   unordered_set<string> terminals = {"+", "-", "*", "/", "(", ")", "number", "id", "$"};
@@ -141,62 +164,34 @@ ParseTable construct_top_down_parse_table()
   return parse_table;
 }
 
-vector<Production> parse(vector<Token> tokens)
+void Parser::parse_next_token(Token token)
 {
-  auto parse_table = construct_top_down_parse_table();
+  auto incoming_terminal = map_token_type_to_terminal(token.get_token_type());
+  auto top_stack_symbol = stack_.top();
 
-  stack<string> parse_stack;
-  parse_stack.push("expr");
-
-  int token_index = 0;
-  vector<Production> productions;
-  while (token_index < tokens.size()) {
-    Token token = tokens[token_index];
-    string terminal = map_token_type_to_terminal(token.get_token_type());
-    string top_stack_symbol = parse_stack.top();
-    cout << "Top stack symbol: " << top_stack_symbol << ", next token: " << terminal;
-
-    if (parse_table.is_non_terminal(top_stack_symbol) && !parse_table[top_stack_symbol][terminal].is_empty()) {
-      Production production = parse_table[top_stack_symbol][terminal];
-      productions.push_back(production);
-      cout << ", rule applied: ";
-      production.print();
-      cout << "\n";
-      vector<string> production_right_side = production.apply();
-      parse_stack.pop();
-      for (vector<string>::reverse_iterator non_terminal_p = production_right_side.rbegin();
-           non_terminal_p != production_right_side.rend();
-           ++non_terminal_p)
-        parse_stack.push(*non_terminal_p);
+  // As long as the top stack symbol is a non terminal, keep expanding it till we reach a terminal.
+  while (parse_table_.is_non_terminal(top_stack_symbol)) {
+    if (parse_table_[top_stack_symbol][incoming_terminal].is_empty()) {
+      // We hit a snag. Abort here and we will handle this mismatch below.
+      break;
     }
-    else if (parse_table.is_terminal(top_stack_symbol) && top_stack_symbol == terminal) {
-      cout << ", matched!\n";
-      parse_stack.pop();
-      ++token_index;
-    }
-    else {
-      cout << "NO!\n";
-      vector<Production> empty_productions = {};
-      return empty_productions;
-    }
-  }
-
-  while (token_index == tokens.size() && !(parse_stack.empty())) {
-    string top_stack_symbol = parse_stack.top();
-    cout << "Top stack symbol: " << top_stack_symbol << ", next token: " << "$";
-    Production production = parse_table[top_stack_symbol]["$"];
-    productions.push_back(production);
-    cout << ", rule applied: ";
-    production.print();
+    auto next_production = parse_table_[top_stack_symbol][incoming_terminal];
+    next_production.print();
     cout << "\n";
-    parse_stack.pop();
+    apply_production(next_production);
+    productions_applied_.push_back(next_production);
+    top_stack_symbol = stack_.top();
   }
 
-  if (token_index == tokens.size() && parse_stack.empty()) {
-    cout << "successful parse\n";
+  if (top_stack_symbol == incoming_terminal) {
+    // If top stack symbol is a terminal, and the incoming terminal and top stack symbol are the same, match them.
+    stack_.pop();
   } else {
-    cout << "unsuccessful parse\n";
+    has_failed_ = true;
   }
+}
 
-  return productions;
+bool Parser::has_failed()
+{
+  return has_failed_;
 }

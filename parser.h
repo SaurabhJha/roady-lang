@@ -2,6 +2,7 @@
 #define ROADY_LANG_PARSER_H_
 
 #include <iostream>
+#include <stack>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -27,7 +28,7 @@ class Production {
   ~Production() = default;
 
   bool is_empty() { return left_side_ == "" && right_side_.size() == 0; }
-  vector<string> apply();
+  vector<string> get_right_side();
   void print()
   {
     cout << left_side_ << "-> ";
@@ -76,6 +77,7 @@ class ParseTable {
   unordered_map<string, ParseTableRow> table_;
 
  public:
+  ParseTable() = default;
   ParseTable(unordered_set<string> non_terminals, unordered_set<string> terminals)
     :non_terminals_{non_terminals}, terminals_{terminals}
   {
@@ -94,6 +96,31 @@ class ParseTable {
 
 string map_token_type_to_terminal(TokenType token_type);
 
+class Parser {
+ private:
+  stack<string> stack_;
+  ParseTable parse_table_;
+  vector<Production> productions_applied_;
+  bool has_failed_;
+
+  void apply_production(Production production);
+  ParseTable construct_top_down_parse_table();
+
+ public:
+  Parser()
+  {
+    parse_table_ = construct_top_down_parse_table();
+    // Initialize the stack with start symbol of the grammar and end of the input symbol '$'
+    stack_.push("$");
+    stack_.push("expr");
+    productions_applied_ = {};
+    has_failed_ = false;
+  }
+  ~Parser() = default;
+
+  void parse_next_token(Token token);
+  bool has_failed();
+};
 vector<Production> parse(vector<Token> tokens);
 
 #endif //ROADY_LANG_PARSER_H_

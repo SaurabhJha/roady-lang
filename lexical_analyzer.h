@@ -98,7 +98,7 @@ class FiniteAutomaton {
  */
 enum class TokenType { invalid,id,number,plus,minus,star,slash,open_bracket,
                        close_bracket,open_paren,close_paren,comma,equals,
-                       double_equals };
+                       double_equals,dollar };
 
 /**
  * A token consists of
@@ -118,6 +118,7 @@ class Token
   ~Token() = default;
 
   TokenType get_token_type() { return token_type_; };
+  string get_lexeme() { return lexeme_; };
   void print();
 };
 

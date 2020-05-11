@@ -13,12 +13,24 @@ int main()
     cout << "#> ";
     getline(cin, input_string);
     string processed_string = remove_whitespace(input_string);
+
     Tokenizer tokenizer(processed_string, 0);
-    vector<Token> tokens = {};
+    Parser parser;
     while (tokenizer.is_there_more_input()) {
-      tokens.push_back(tokenizer.get_next_token());
+      auto next_token = tokenizer.get_next_token();
+      parser.parse_next_token(next_token);
+      if (parser.has_failed()) {
+        cout << "Failure at: " << next_token.get_lexeme() << "\n";
+        break;
+      }
     }
-    parse(tokens);
+    auto end_token = Token(TokenType::dollar, "");
+    parser.parse_next_token(end_token);
+    if (parser.has_failed()) {
+      cout << "Unsuccesful parse\n";
+    } else {
+      cout << "Successful parse\n";
+    }
     cout << "\n";
   }
 }
