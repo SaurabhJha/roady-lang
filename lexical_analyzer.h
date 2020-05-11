@@ -96,9 +96,9 @@ class FiniteAutomaton {
 /**
  * These are the token types we support. "invalid" token is for unrecognizable tokens.
  */
-enum class TokenType { invalid,id,number,plus,minus,star,slash,open_bracket,
-                       close_bracket,open_paren,close_paren,comma,equals,
-                       double_equals,dollar };
+enum class TokenType { invalid, id, number, plus, minus, star, slash, open_bracket,
+                       close_bracket, open_paren, close_paren, comma, equals,
+                       double_equals, dollar };
 
 /**
  * A token consists of
