@@ -255,7 +255,7 @@ Token Tokenizer::get_next_token() {
 /**
  * Checks whether there is any more input left in this tokenizer.
  */
-bool Tokenizer::is_there_more_input()
+bool Tokenizer::there_is_more_input()
 {
   return current_index_ < raw_input_.length();
 }

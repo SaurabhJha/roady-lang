@@ -157,7 +157,7 @@ class Tokenizer
   ~Tokenizer() = default;
 
   Token get_next_token();
-  bool is_there_more_input();
+  bool there_is_more_input();
 };
 
 FiniteAutomaton construct_automaton_for_id();

@@ -28,6 +28,7 @@ class Production {
   ~Production() = default;
 
   bool is_empty() { return left_side_ == "" && right_side_.size() == 0; }
+  string get_left_side();
   vector<string> get_right_side();
   void print()
   {
@@ -103,17 +104,17 @@ string map_token_type_to_terminal(TokenType token_type);
 class TopDownParser {
  private:
   stack<string> stack_;
-  TopDownParsingTable parse_table_;
+  TopDownParsingTable parsing_table_;
   vector<Production> productions_applied_;
   bool has_failed_;
 
   void apply_production(Production production);
-  TopDownParsingTable construct_top_down_parse_table();
+  TopDownParsingTable construct_parsing_table();
 
  public:
   TopDownParser()
   {
-    parse_table_ = construct_top_down_parse_table();
+    parsing_table_ = construct_parsing_table();
     // Initialize the stack with start symbol of the grammar and end of the input symbol '$'
     stack_.push("$");
     stack_.push("expr");
@@ -125,6 +126,98 @@ class TopDownParser {
   void parse_next_token(Token token);
   bool has_failed();
   vector<Production> get_productions_applied();
+};
+
+enum class BottomUpParsingActionType { shift, reduce, accept };
+
+class BottomUpParsingAction {
+ private:
+  BottomUpParsingActionType action_type_;
+  // To be interpreted as next state if the action type is shift
+  // and production number if action type is reduce.
+  int action_number_;
+
+ public:
+  BottomUpParsingAction() = default;
+  BottomUpParsingAction(BottomUpParsingActionType action_type, int action_number)
+    :action_type_{action_type}, action_number_{action_number} {}
+  ~BottomUpParsingAction() = default;
+
+  BottomUpParsingActionType get_action_type() { return action_type_; }
+  int get_action_number() { return action_number_; }
+};
+
+class BottomUpParsingActionTableRow {
+ private:
+  unordered_map<string, BottomUpParsingAction> row_;
+
+ public:
+  BottomUpParsingActionTableRow() = default;
+  ~BottomUpParsingActionTableRow() = default;
+
+  void add_terminal_action_pair(string terminal, BottomUpParsingAction action);
+  BottomUpParsingAction operator[](string terminal);
+};
+
+class BottomUpParsingActionTable {
+ private:
+  unordered_map<int, BottomUpParsingActionTableRow> table_;
+
+ public:
+  BottomUpParsingActionTable() = default;
+  ~BottomUpParsingActionTable() = default;
+
+  void add_rule(int state, string terminal, BottomUpParsingAction action);
+  BottomUpParsingActionTableRow operator[](int state);
+};
+
+class BottomUpParsingGotoTableRow {
+ private:
+  unordered_map<string, int> row_;
+ public:
+  void add_nonterminal_state_pair(string nonterminal, int state);
+  int operator[](string nonterminal);
+};
+
+class BottomUpParsingGotoTable {
+ private:
+  unordered_map<int, BottomUpParsingGotoTableRow> table_;
+
+ public:
+  BottomUpParsingGotoTable() = default;
+  ~BottomUpParsingGotoTable() = default;
+
+  void add_rule(int state, string nonterminal, int new_state);
+  BottomUpParsingGotoTableRow operator[](int state);
+};
+
+class BottomUpParser {
+ private:
+  unordered_map<int, Production> numbered_reductions_;
+  BottomUpParsingActionTable action_table_;
+  BottomUpParsingGotoTable goto_table_;
+  stack<int> stack_;
+  vector<Production> reductions_applied_;
+  bool has_failed_;
+
+  void construct_productions();
+  void construct_action_table();
+  void construct_goto_table();
+  BottomUpParsingAction apply_reduction(BottomUpParsingAction next_action, string terminal);
+
+ public:
+  BottomUpParser()
+  {
+    construct_productions();
+    construct_action_table();
+    construct_goto_table();
+    stack_.push(0);
+  }
+  ~BottomUpParser() = default;
+
+  void parse_next_token(Token token);
+  bool has_failed();
+  vector<Production> get_reductions_applied();
 };
 
 #endif //ROADY_LANG_PARSER_H_
