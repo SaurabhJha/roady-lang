@@ -2,8 +2,8 @@
 #include <string>
 #include <vector>
 
-#include "./parser.h"
-#include "./lexical_analyzer.h"
+#include "./parser_top_down.h"
+#include "./parser_bottom_up.h"
 using namespace std;
 
 int main()
