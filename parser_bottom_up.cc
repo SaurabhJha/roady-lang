@@ -444,7 +444,19 @@ void BottomUpParser::construct_goto_table()
   goto_table_.add_rule(8, "factor", 14);
 }
 
-BottomUpParsingAction BottomUpParser::apply_reduction(BottomUpParsingAction next_action, string terminal)
+void BottomUpParser::shift(BottomUpParsingAction next_action)
+{
+  if (next_action.get_action_number() != 0) {
+    auto next_state = next_action.get_action_number();
+    auto stack_record = StackRecord(StackRecordType::state);
+    stack_record.set_state(next_state);
+    stack_.push(stack_record);
+  } else {
+    has_failed_ = true;
+  }
+}
+
+BottomUpParsingAction BottomUpParser::reduce(BottomUpParsingAction next_action, string terminal)
 {
   // Get the reduction to be applied.
   auto reduction_number = next_action.get_action_number();
@@ -455,9 +467,11 @@ BottomUpParsingAction BottomUpParser::apply_reduction(BottomUpParsingAction next
   for (auto i = 0; i < next_reduction.get_right_side().size(); ++i)
     stack_.pop();
   auto resultant_nonterminal = next_reduction.get_left_side();
-  auto state_on_top = stack_.top();
+  auto state_on_top = stack_.top().get_state();
   auto next_state = goto_table_[state_on_top][resultant_nonterminal];
-  stack_.push(next_state);
+  auto new_stack_record = StackRecord(StackRecordType::state);
+  new_stack_record.set_state(next_state);
+  stack_.push(new_stack_record);
 
   // Return the next action.
   return action_table_[next_state][terminal];
@@ -469,24 +483,17 @@ BottomUpParsingAction BottomUpParser::apply_reduction(BottomUpParsingAction next
 void BottomUpParser::parse_next_token(Token token)
 {
   auto terminal = map_token_type_to_terminal(token.get_token_type());
-  auto next_action = action_table_[stack_.top()][terminal];
+  auto next_action = action_table_[stack_.top().get_state()][terminal];
 
   // Keep reducing till no more reductions are possible.
   while (next_action.get_action_type() == BottomUpParsingActionType::reduce) {
-    next_action = apply_reduction(next_action, terminal);
+    next_action = reduce(next_action, terminal);
   }
 
   // Shift now if that's the next move.
   if (next_action.get_action_type() == BottomUpParsingActionType::shift) {
-    if (next_action.get_action_number() != 0) {
-      auto next_state = next_action.get_action_number();
-      stack_.push(next_state);
-    } else {
-      has_failed_ = true;
-    }
+    shift(next_action);
   }
-
-  // You implicitly accept otherwise.
 }
 
 bool BottomUpParser::has_failed()

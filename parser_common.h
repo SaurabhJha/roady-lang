@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -37,5 +38,22 @@ class Production {
 };
 
 string map_token_type_to_terminal(TokenType token_type);
+
+enum class StackRecordType { state, synthesized };
+
+class StackRecord {
+ private:
+  StackRecordType type_;
+  int state_;
+  unordered_map<string, string> attributes_;
+
+ public:
+  StackRecord(StackRecordType type)
+    :type_{type} {}
+  ~StackRecord() = default;
+
+  void set_state(int state);
+  int get_state();
+};
 
 #endif //ROADY_LANG_PARSER_COMMON_H_

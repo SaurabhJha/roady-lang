@@ -50,6 +50,15 @@ string map_token_type_to_terminal(TokenType token_type)
       return "$";
     case (TokenType::invalid):
       return "";
-
   }
+}
+
+void StackRecord::set_state(int state)
+{
+  state_ = state;
+}
+
+int StackRecord::get_state()
+{
+  return state_;
 }

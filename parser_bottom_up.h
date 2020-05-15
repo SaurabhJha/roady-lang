@@ -78,22 +78,23 @@ class BottomUpParser {
   unordered_map<int, Production> numbered_reductions_;
   BottomUpParsingActionTable action_table_;
   BottomUpParsingGotoTable goto_table_;
-  stack<int> stack_;
+  stack<StackRecord> stack_;
   vector<Production> reductions_applied_;
   bool has_failed_;
 
   void construct_productions();
   void construct_action_table();
   void construct_goto_table();
-  BottomUpParsingAction apply_reduction(BottomUpParsingAction next_action, string terminal);
-
+  void shift(BottomUpParsingAction next_action);
+  BottomUpParsingAction reduce(BottomUpParsingAction next_action, string terminal);
  public:
   BottomUpParser()
   {
     construct_productions();
     construct_action_table();
     construct_goto_table();
-    stack_.push(0);
+    StackRecord initial_stack_record = StackRecord(StackRecordType::state);
+    stack_.push(initial_stack_record);
   }
   ~BottomUpParser() = default;
 
