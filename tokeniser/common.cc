@@ -1,6 +1,6 @@
-#include <stack>
+#include "tokeniser/common.h"
 
-#include "./common.h"
+#include <stack>
 
 namespace common_tokeniser
 {
@@ -40,7 +40,7 @@ int find_matching_parenthesis_index(std::string regex_string, int parenthesis_id
     ++matching_parenthesis_idx;
   }
 
-  if (parenthesis_stack.empty() return matching_parenthesis_idx;
+  if (parenthesis_stack.empty()) return matching_parenthesis_idx;
   else return 0;
 }
 
