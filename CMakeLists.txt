@@ -5,6 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(.)
 
-set(SOURCE_FILES lexical_analyzer.cc parser_common.cc parser_top_down.cc parser_bottom_up.cc main.cc)
+set(SOURCE_FILES main.cc tokeniser/common.cc tokeniser/regex.cc tokeniser/finite_automata.cc)
 
 add_executable(roady_lang ${SOURCE_FILES})
