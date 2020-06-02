@@ -1,6 +1,4 @@
-#include <iostream>
-
-#include "./regex.h"
+#include "tokeniser/regex.h"
 
 namespace regex {
 

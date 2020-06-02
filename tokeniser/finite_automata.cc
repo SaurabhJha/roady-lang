@@ -1,6 +1,6 @@
-#include <algorithm>
+#include "tokeniser/finite_automata.h"
 
-#include "finite_automata.h"
+#include <algorithm>
 
 namespace finite_automata {
 

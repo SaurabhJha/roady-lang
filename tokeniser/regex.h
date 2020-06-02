@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "./common.h"
-#include "./finite_automata.h"
+#include "tokeniser/common.h"
+#include "tokeniser/finite_automata.h"
 
 namespace regex {
 
