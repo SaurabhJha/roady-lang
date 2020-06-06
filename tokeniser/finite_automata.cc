@@ -180,6 +180,7 @@ FiniteAutomata FiniteAutomata::compute_exponentiation()
   table.add_new_transition(new_start_state, old_start_state, "");
   table.add_new_transition(old_final_state, new_final_state, "");
   table.add_new_transition(old_final_state, old_start_state, "");
+  table.add_new_transition(new_start_state, new_final_state, "");
 
   FiniteAutomata resultant_automata(new_start_state, new_final_state, table);
   return resultant_automata;
