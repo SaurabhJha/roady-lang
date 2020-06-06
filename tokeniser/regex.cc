@@ -12,26 +12,26 @@ namespace regex {
 finite_automata::FiniteAutomata compile_regex_to_automata(const std::string& regex_string)
 {
   // First operand's automaton.
-  auto first_operand = get_first_operand(regex_string);
-  first_operand = common_tokeniser::trim_parenthesis(first_operand);
+  auto first_operand = get_first_operand(regex_string); // O(REGEX_LEN)
+  first_operand = common_tokeniser::trim_parenthesis(first_operand); // O(REGEX_LEN)
   finite_automata::FiniteAutomata first_automata;
   if (first_operand.length() > 1)
-    first_automata = compile_regex_to_automata(first_operand);
+    first_automata = compile_regex_to_automata(first_operand); // O(REGEX_LEN/2)
   else
     first_automata.add_new_transition(1, 2, first_operand);
 
   // If the regex is a single character, we are done.
   if (regex_string.length() == 1) return first_automata;
 
-  auto op =  get_operator(regex_string);
+  auto op =  get_operator(regex_string); // O(REGEX_LEN)
   // If the operator is exponentiation, there is no second operand.
   if (op == common_tokeniser::RegexOperatorType::exp) return first_automata.compute_exponentiation();
 
   // Second operand's automaton.
-  auto second_operand = common_tokeniser::trim_parenthesis(get_second_operand(regex_string));
+  auto second_operand = common_tokeniser::trim_parenthesis(get_second_operand(regex_string)); // O(REGEX_LEN)
   finite_automata::FiniteAutomata second_automata;
   if (second_operand.length() > 1)
-    second_automata = compile_regex_to_automata(second_operand);
+    second_automata = compile_regex_to_automata(second_operand); // O(REGEX_LEN/2)
   else
     second_automata.add_new_transition(1, 2, second_operand);
 

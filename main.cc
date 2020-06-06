@@ -1,13 +1,21 @@
 #include "tokeniser/regex.h"
+#include "tokeniser/tokeniser.h"
 #include <iostream>
+
+#include <chrono>
 
 int main()
 {
-  auto automata = regex::compile_regex_to_automata("(a|b)(c|d)");
-  automata.move("a");
-  std::cout << automata.has_accepted() << "\n";
-  std::cout << automata.has_died() << "\n";
-  automata.move("d");
-  std::cout << automata.has_accepted() << "\n";
-  std::cout << automata.has_died() << "\n";
+  auto t1 = std::chrono::high_resolution_clock::now();
+  auto test_tokeniser = tokeniser::Tokeniser("z21", 0);
+  test_tokeniser.get_next_token();
+  test_tokeniser.get_next_token();
+  test_tokeniser.get_next_token();
+
+  auto t2 = std::chrono::high_resolution_clock::now();
+
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
+
+  std::cout << "Duration: " << duration << "\n";
+  return 0;
 }
