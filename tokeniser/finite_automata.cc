@@ -72,6 +72,10 @@ TransitionTable TransitionTable::combine_with(const TransitionTable& other_table
 
 std::unordered_set<int> FiniteAutomata::compute_epsilon_closure(int state)
 {
+  // Memoization.
+  if (closure_sets_.find(state) != closure_sets_.end())
+    return closure_sets_[state];
+
   std::unordered_set<int> closure_set = {state};
   for (auto curr_state : closure_set) {
     for (auto next_state : table_[curr_state][""]) {
@@ -80,6 +84,7 @@ std::unordered_set<int> FiniteAutomata::compute_epsilon_closure(int state)
         closure_set.insert(skip_state);
     }
   }
+  closure_sets_[state] = closure_set;
   return closure_set;
 }
 
