@@ -7,7 +7,7 @@
 int main()
 {
   auto t1 = std::chrono::high_resolution_clock::now();
-  auto test_tokeniser = tokeniser::Tokeniser("z21", 0);
+  auto test_tokeniser = tokeniser::Tokeniser("AB21+", 0);
   test_tokeniser.get_next_token();
   test_tokeniser.get_next_token();
   test_tokeniser.get_next_token();

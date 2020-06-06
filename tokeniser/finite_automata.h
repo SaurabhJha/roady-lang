@@ -68,6 +68,7 @@ class FiniteAutomata {
   int initial_state_;
   int final_state_; // For our automata, there is only one final state.
   std::unordered_set<int> current_states_;
+  std::unordered_map<int, std::unordered_set<int>> closure_sets_; // Used to memoize closure sets.
   TransitionTable table_;
 
   std::unordered_set<int> compute_epsilon_closure(int state);
