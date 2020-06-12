@@ -1,8 +1,5 @@
-#include "tokeniser/regex.h"
-#include "tokeniser/tokeniser.h"
+#include "tokeniser/tokenizer.h"
 #include <iostream>
-
-#include <chrono>
 
 int main()
 {
