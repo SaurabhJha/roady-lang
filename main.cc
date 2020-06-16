@@ -1,18 +1,24 @@
-#include "tokeniser/tokenizer.h"
+#include "parser/grammar.h"
+
 #include <iostream>
 
 int main()
 {
-  auto t1 = std::chrono::high_resolution_clock::now();
-  auto test_tokeniser = tokeniser::Tokeniser("zdsdf=123", 0);
-  test_tokeniser.get_next_token();
-  test_tokeniser.get_next_token();
-  test_tokeniser.get_next_token();
+  parser::Grammar grammar;
+  parser::Production expr_production1("expr", {"expr", "+", "term"});
+  parser::Production expr_production2("expr", {"term"});
+  parser::Production term_production1("term", {"term", "*", "factor"});
+  parser::Production term_production2("term", {"factor"});
+  parser::Production factor_production1("factor", {"number"});
+  parser::Production factor_production2("factor", {"(", "expr", ")"});
 
-  auto t2 = std::chrono::high_resolution_clock::now();
+  grammar.add_production(expr_production1);
+  grammar.add_production(expr_production2);
+  grammar.add_production(term_production1);
+  grammar.add_production(term_production2);
+  grammar.add_production(factor_production1);
+  grammar.add_production(factor_production2);
 
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
-
-  std::cout << "Duration: " << duration << "\n";
-  return 0;
+  for (auto x : grammar.compute_follow("term"))
+    std::cout << x << " ";
 }
