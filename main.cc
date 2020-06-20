@@ -1,7 +1,5 @@
 #include "parser/grammar.h"
 
-#include <iostream>
-
 int main()
 {
   parser::Grammar grammar("expr'");

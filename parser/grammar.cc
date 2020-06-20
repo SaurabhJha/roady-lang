@@ -151,10 +151,12 @@ void LR0Item::include_non_kernel_items()
     auto production_number = item_position_in_production.first;
     auto production = productions_[production_number];
     auto body_position = item_position_in_production.second;
-    auto next_body_symbol = production.get_body()[body_position];
-    if (is_non_terminal(next_body_symbol) && non_terminals_seen.find(next_body_symbol) == non_terminals_seen.end()) {
-      non_terminals_seen.insert(next_body_symbol);
-      queue_of_non_terminals.push_back(next_body_symbol);
+    if (body_position < production.get_body().size()) {
+      auto next_body_symbol = production.get_body()[body_position];
+      if (is_non_terminal(next_body_symbol) && non_terminals_seen.find(next_body_symbol) == non_terminals_seen.end()) {
+        non_terminals_seen.insert(next_body_symbol);
+        queue_of_non_terminals.push_back(next_body_symbol);
+      }
     }
   }
 
