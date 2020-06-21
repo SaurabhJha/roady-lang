@@ -1,12 +1,12 @@
 #include <string>
 #include <utility>
 
-#include "tokeniser/finite_automata.h"
+#include "tokenizer/finite_automata.h"
 
-namespace tokeniser
+namespace tokenizer
 {
 
-class Tokeniser
+class tokenizer
 {
  private:
   std::string input_;
@@ -14,9 +14,9 @@ class Tokeniser
   std::string apply_automata(finite_automata::FiniteAutomata automaton);
 
  public:
-  Tokeniser(std::string input, int current_input_idx)
+  tokenizer(std::string input, int current_input_idx)
     : input_{std::move(input)}, current_input_idx_{current_input_idx} {}
-  ~Tokeniser() = default;
+  ~tokenizer() = default;
 
   void get_next_token();
 };

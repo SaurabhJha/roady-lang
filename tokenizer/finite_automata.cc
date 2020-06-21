@@ -1,4 +1,4 @@
-#include "tokeniser/finite_automata.h"
+#include "tokenizer/finite_automata.h"
 
 #include <algorithm>
 

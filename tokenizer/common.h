@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace common_tokeniser
+namespace common_tokenizer
 {
 
 enum class RegexOperatorType { concat, exp, unio };

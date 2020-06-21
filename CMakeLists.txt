@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 include_directories(.)
 
-set(SOURCE_FILES main.cc tokeniser/common.cc tokeniser/regex.cc tokeniser/finite_automata.cc tokeniser/tokenizer.cc
+set(SOURCE_FILES main.cc tokenizer/common.cc tokenizer/regex.cc tokenizer/finite_automata.cc tokenizer/tokenizer.cc
         parser/grammar.cc)
 # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")

@@ -1,8 +1,8 @@
-#include "tokeniser/common.h"
+#include "tokenizer/common.h"
 
 #include <stack>
 
-namespace common_tokeniser
+namespace common_tokenizer
 {
 
 /**

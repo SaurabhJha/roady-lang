@@ -6,7 +6,7 @@
 #include <unordered_set>
 #include <utility>
 
-#include "tokeniser/common.h"
+#include "tokenizer/common.h"
 
 namespace finite_automata {
 

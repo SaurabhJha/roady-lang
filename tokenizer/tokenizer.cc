@@ -1,14 +1,14 @@
-#include "tokeniser/tokenizer.h"
+#include "tokenizer/tokenizer.h"
 
 #include <iostream>
 #include <vector>
 
-#include "tokeniser/regex.h"
+#include "tokenizer/regex.h"
 
-namespace tokeniser
+namespace tokenizer
 {
 
-std::string Tokeniser::apply_automata(finite_automata::FiniteAutomata automaton)
+std::string tokenizer::apply_automata(finite_automata::FiniteAutomata automaton)
 {
   int accepted_at = 0;
   int input_idx = current_input_idx_;
@@ -31,7 +31,7 @@ std::string Tokeniser::apply_automata(finite_automata::FiniteAutomata automaton)
  * We turn automata in turn and return the token corresponding to the automaton which matched the string with the
  * maximum length. Its an implementation of maximal munch policy.
  */
-void tokeniser::Tokeniser::get_next_token()
+void tokenizer::tokenizer::get_next_token()
 {
   std::string single_alphabet_regex = "(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z)";
   std::string single_number_regex = "(1|2|3|4|5|6|7|8|9|0)";
