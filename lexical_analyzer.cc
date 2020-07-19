@@ -238,9 +238,9 @@ Token Tokenizer::get_next_token() {
     }
   }
 
-  // Update tokenizer state to set the correct input pointer.
+  // Update tokenizer_tokenizer state to set the correct input pointer.
   if (token_type == TokenType::invalid) {
-    // Set the state so that the tokenizer is aborted. Also set the lexeme at the current input.
+    // Set the state so that the tokenizer_tokenizer is aborted. Also set the lexeme at the current input.
     lexeme = raw_input_[current_index_];
     current_index_ = raw_input_.length();
   }
@@ -253,7 +253,7 @@ Token Tokenizer::get_next_token() {
 }
 
 /**
- * Checks whether there is any more input left in this tokenizer.
+ * Checks whether there is any more input left in this tokenizer_tokenizer.
  */
 bool Tokenizer::there_is_more_input()
 {

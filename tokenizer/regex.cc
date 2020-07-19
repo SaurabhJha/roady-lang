@@ -1,78 +1,81 @@
 #include "tokenizer/regex.h"
 
-namespace regex {
+namespace tokenizer_regex {
 
 /**
- * Given a valid regex string, construct an equivalent finite automaton using inductive
+ * Given a valid tokenizer_regex string, construct an equivalent finite automaton using inductive
  * definition.
  *
  * @param regex_string
  * @return
  */
-finite_automata::FiniteAutomata compile_regex_to_automata(const std::string& regex_string)
-{
+tokenizer_finite_automata::FiniteAutomata compile_regex_to_automata(
+    const std::string& regex_string) {
   // First operand's automaton.
-  auto first_operand = get_first_operand(regex_string); // O(REGEX_LEN)
-  first_operand = common_tokenizer::trim_parenthesis(first_operand); // O(REGEX_LEN)
-  finite_automata::FiniteAutomata first_automata;
+  auto first_operand = get_first_operand(regex_string);
+  first_operand = tokenizer_common::trim_parenthesis(first_operand);
+  tokenizer_finite_automata::FiniteAutomata first_automata;
   if (first_operand.length() > 1)
-    first_automata = compile_regex_to_automata(first_operand); // O(REGEX_LEN/2)
+    first_automata = compile_regex_to_automata(first_operand);
   else
     first_automata.add_new_transition(1, 2, first_operand);
 
-  // If the regex is a single character, we are done.
+  // If the tokenizer_regex is a single character, we are done.
   if (regex_string.length() == 1) return first_automata;
 
-  auto op =  get_operator(regex_string); // O(REGEX_LEN)
+  auto op =  get_operator(regex_string);
   // If the operator is exponentiation, there is no second operand.
-  if (op == common_tokenizer::RegexOperatorType::exp) return first_automata.compute_exponentiation();
+  if (op == tokenizer_common::RegexOperatorType::exp)
+    return first_automata.compute_exponentiation();
 
   // Second operand's automaton.
-  auto second_operand = common_tokenizer::trim_parenthesis(get_second_operand(regex_string)); // O(REGEX_LEN)
-  finite_automata::FiniteAutomata second_automata;
+  auto second_operand =
+      tokenizer_common::trim_parenthesis(get_second_operand(regex_string));
+  tokenizer_finite_automata::FiniteAutomata second_automata;
   if (second_operand.length() > 1)
-    second_automata = compile_regex_to_automata(second_operand); // O(REGEX_LEN/2)
+    second_automata = compile_regex_to_automata(second_operand);
   else
     second_automata.add_new_transition(1, 2, second_operand);
 
   // Combine both operands.
-  if (op == common_tokenizer::RegexOperatorType::unio)
+  if (op == tokenizer_common::RegexOperatorType::unio)
     return first_automata.union_with(second_automata);
   else
     return first_automata.concatenate_with(second_automata);
 }
 
-std::string get_first_operand(std::string regex_string)
-{
+std::string get_first_operand(std::string regex_string) {
   auto substring_length = 0;
   if (regex_string[0] == '(') {
-    substring_length = common_tokenizer::find_matching_parenthesis_index(regex_string, 0);
-  } else
+    substring_length = tokenizer_common::find_matching_parenthesis_index(
+        regex_string, 0);
+  } else {
     substring_length = 1;
+  }
   return regex_string.substr(0, substring_length);
 }
 
-common_tokenizer::RegexOperatorType get_operator(std::string regex_string)
-{
+tokenizer_common::RegexOperatorType get_operator(std::string regex_string) {
   auto first_operand = get_first_operand(regex_string);
   switch (regex_string[first_operand.length()]) {
-    case '|': return common_tokenizer::RegexOperatorType::unio;
-    case '*': return common_tokenizer::RegexOperatorType::exp;
-    default: return common_tokenizer::RegexOperatorType::concat;
+    case '|': return tokenizer_common::RegexOperatorType::unio;
+    case '*': return tokenizer_common::RegexOperatorType::exp;
+    default: return tokenizer_common::RegexOperatorType::concat;
   }
 }
 
-std::string get_second_operand(const std::string& regex_string)
-{
+std::string get_second_operand(const std::string& regex_string) {
   auto first_operand = get_first_operand(regex_string);
   auto op = get_operator(regex_string);
   auto op_length = 0;
 
-  if (op == common_tokenizer::RegexOperatorType::unio || op == common_tokenizer::RegexOperatorType::exp)
+  if (op == tokenizer_common::RegexOperatorType::unio || op ==
+      tokenizer_common::RegexOperatorType::exp)
     op_length = 1;
   else
     op_length = 0;
-  return regex_string.substr(first_operand.length()+op_length, (regex_string.length() - first_operand.length() - op_length));
+  return regex_string.substr(first_operand.length()+op_length,
+      (regex_string.length() - first_operand.length() - op_length));
 }
 
-}
+}  // namespace tokenizer_regex

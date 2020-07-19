@@ -478,7 +478,7 @@ BottomUpParsingAction BottomUpParser::reduce(BottomUpParsingAction next_action, 
 }
 
 /**
- * An implementation of SLR(1) shift reduce parser.
+ * An implementation of SLR(1) shift reduce parser_grammar.
  */
 void BottomUpParser::parse_next_token(Token token)
 {

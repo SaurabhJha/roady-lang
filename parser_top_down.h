@@ -64,8 +64,8 @@ class TopDownParsingTable {
   TopDownParsingTableRow operator[](const string& non_terminal);
 };
 /**
- * An LL(1) parser implementation. It contains all the state necessary to incrementally process tokens
- * output by the tokenizer.
+ * An LL(1) parser_grammar implementation. It contains all the state necessary to incrementally process tokens
+ * output by the tokenizer_tokenizer.
  */
 class TopDownParser {
  private:
@@ -81,7 +81,7 @@ class TopDownParser {
   TopDownParser()
   {
     parsing_table_ = construct_parsing_table();
-    // Initialize the stack with start symbol of the grammar and end of the input symbol '$'
+    // Initialize the stack with start symbol of the parser_grammar and end of the input symbol '$'
     stack_.push("$");
     stack_.push("expr");
     productions_applied_ = {};

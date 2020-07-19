@@ -142,7 +142,7 @@ class TokenTypeAutomatonPair
 };
 
 /**
- * A tokenizer implementation. It contains all the state necessary to generate tokens one-by-one
+ * A tokenizer_tokenizer implementation. It contains all the state necessary to generate tokens one-by-one
  * from a text string.
  */
 class Tokenizer

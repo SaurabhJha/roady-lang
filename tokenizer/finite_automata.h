@@ -1,5 +1,5 @@
-#ifndef FINITE_AUTOMATA_H_
-#define FINITE_AUTOMATA_H_
+#ifndef TOKENIZER_FINITE_AUTOMATA_H_
+#define TOKENIZER_FINITE_AUTOMATA_H_
 
 #include <string>
 #include <unordered_map>
@@ -8,7 +8,7 @@
 
 #include "tokenizer/common.h"
 
-namespace finite_automata {
+namespace tokenizer_finite_automata {
 
 /**
  * A transition table row is an associative data structure where the keys are
@@ -22,8 +22,7 @@ class TransitionTableRow {
   TransitionTableRow() = default;
   ~TransitionTableRow() = default;
 
-  std::unordered_set<int> operator[](const std::string& input)
-  {
+  std::unordered_set<int> operator[](const std::string& input) {
     return row_[input];
   }
 
@@ -44,13 +43,13 @@ class TransitionTable {
   TransitionTable() = default;
   ~TransitionTable() = default;
 
-  TransitionTableRow operator[](int state)
-  {
+  TransitionTableRow operator[](int state) {
     return table_[state];
   }
 
   void increase_state_numbers_by(int number);
-  void add_new_transition(int prev_state, int next_state, const std::string& input);
+  void add_new_transition(
+      int prev_state, int next_state, const std::string& input);
   TransitionTable combine_with(const TransitionTable& other_table);
 };
 
@@ -60,15 +59,16 @@ class TransitionTable {
  * 2. A set of states designated as the final state.
  * 3. A transition table.
  *
- * This is a non-deterministic finite automata. We simulate the views by calculating epsilon closures
- * for current states on inputs.
+ * This is a non-deterministic finite automata. We simulate the views by
+ * calculating epsilon closures for current states on inputs.
  */
 class FiniteAutomata {
  private:
   int initial_state_;
-  int final_state_; // For our automata, there is only one final state.
+  int final_state_;  // For our automata, there is only one final state.
   std::unordered_set<int> current_states_;
-  std::unordered_map<int, std::unordered_set<int>> closure_sets_; // Used to memoize closure sets.
+  std::unordered_map<int, std::unordered_set<int>> closure_sets_;
+    // Used to memoize closure sets.
   TransitionTable table_;
 
   std::unordered_set<int> compute_epsilon_closure(int state);
@@ -81,7 +81,8 @@ class FiniteAutomata {
     current_states_ = compute_epsilon_closure(initial_state_);
   }
 
-  FiniteAutomata(int initial_state, int final_state, const TransitionTable& table)
+  FiniteAutomata(
+      int initial_state, int final_state, const TransitionTable& table)
     :initial_state_{initial_state}, final_state_{final_state}, table_{table}
   {
     current_states_ = compute_epsilon_closure(initial_state);
@@ -94,7 +95,8 @@ class FiniteAutomata {
   int get_final_state() { return final_state_; }
 
   void increase_state_numbers_by(int number);
-  void add_new_transition(int prev_state, int next_state, const std::string& input);
+  void add_new_transition(
+      int prev_state, int next_state, const std::string& input);
   FiniteAutomata union_with(FiniteAutomata other_automata);
   FiniteAutomata concatenate_with(FiniteAutomata other_automata);
   FiniteAutomata compute_exponentiation();
@@ -103,6 +105,6 @@ class FiniteAutomata {
   bool has_died();
 };
 
-}
+}  // namespace tokenizer_finite_automata
 
-#endif // FINITE_AUTOMATA_H_
+#endif  // TOKENIZER_FINITE_AUTOMATA_H_

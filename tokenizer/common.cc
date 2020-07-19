@@ -2,18 +2,18 @@
 
 #include <stack>
 
-namespace common_tokenizer
-{
+namespace tokenizer_common {
 
 /**
  * Trims surrounding parenthesis from an expression. Assumes that the outermost parenthesis are balanced.
  *
  * For example, given ((a|b)(c|d)), it will return (a|b)(c|d).
  */
-std::string trim_parenthesis(std::string regex_string)
-{
-  if (regex_string[0] == '(') return regex_string.substr(1, regex_string.length() - 2);
-  else return regex_string;
+std::string trim_parenthesis(std::string regex_string) {
+  if (regex_string[0] == '(')
+    return regex_string.substr(1, regex_string.length() - 2);
+  else
+    return regex_string;
 }
 
 /**
@@ -25,23 +25,26 @@ std::string trim_parenthesis(std::string regex_string)
  * @param parenthesis_idx
  * @return
  */
-int find_matching_parenthesis_index(std::string regex_string, int parenthesis_idx)
-{
+int find_matching_parenthesis_index(
+    std::string regex_string, int parenthesis_idx) {
   std::stack<std::string> parenthesis_stack;
   parenthesis_stack.push("(");
   auto matching_parenthesis_idx = parenthesis_idx + 1;
-  while (!parenthesis_stack.empty() && matching_parenthesis_idx < regex_string.length()) {
+  while (!parenthesis_stack.empty() &&
+          matching_parenthesis_idx < regex_string.length()) {
     if (regex_string[matching_parenthesis_idx] == '(')
       // New open parenthesis. Push down to the stack.
       parenthesis_stack.push("(");
-    else if(regex_string[matching_parenthesis_idx] == ')')
+    else if (regex_string[matching_parenthesis_idx] == ')')
       // Closed parenthesis. Pop the matching open parenthesis from the stack.
       parenthesis_stack.pop();
     ++matching_parenthesis_idx;
   }
 
-  if (parenthesis_stack.empty()) return matching_parenthesis_idx;
-  else return 0;
+  if (parenthesis_stack.empty())
+    return matching_parenthesis_idx;
+  else
+    return 0;
 }
 
-}
+}  // namespace tokenizer_common

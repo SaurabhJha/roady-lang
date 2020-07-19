@@ -34,9 +34,9 @@ TopDownParsingTableRow TopDownParsingTable::operator[](const string& non_termina
 }
 
 /**
- * Apply a production by popping the top grammar symbol and pushing in the right side of the production.
+ * Apply a production by popping the top parser_grammar symbol and pushing in the right side of the production.
  * The right side is pushed in the order such that the rightmost symbol appear at the bottom and the
- * leftmost symbol at the top, in accordance with requirement of LL(1) parser.
+ * leftmost symbol at the top, in accordance with requirement of LL(1) parser_grammar.
  *
  * Here's an example. Suppose the production is "expr' -> + term expr'". The successive stack states would
  * look like this
@@ -53,7 +53,7 @@ void TopDownParser::apply_production(Production production)
 }
 
 /**
- * Construct the top-down parse table for the following arithmetic expressions grammar.
+ * Construct the top-down parse table for the following arithmetic expressions parser_grammar.
  *
  *   expr -> term expr'
  *   expr' -> + term expr' | - term expr' | epsilon
