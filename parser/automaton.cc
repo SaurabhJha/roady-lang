@@ -64,7 +64,7 @@ void LR0ItemSet::compute_epsilon_closure(parser_grammar::Grammar grammar) {
     auto current_item = queue.front();
     queue.pop_front();
 
-    if (!grammar.is_terminal(current_item.get_next_symbol())) {
+    if (!current_item.is_reducible() && !grammar.is_terminal(current_item.get_next_symbol())) {
       // Next symbol is a non terminal so we need to consider adding the productions of this
       // non terminal to the item set.
       auto next_non_terminal = current_item.get_next_symbol();
@@ -94,7 +94,7 @@ std::unordered_set<std::string> LR0ItemSet::get_next_symbols() {
 LR0ItemSet LR0ItemSet::get_next_item_set(const std::string& transition_symbol, const parser_grammar::Grammar& grammar) {
   LR0ItemSet next_item_set;
   for (auto current_item : item_set_) {
-    if (current_item.get_next_symbol() == transition_symbol) {
+    if (!current_item.is_reducible() && current_item.get_next_symbol() == transition_symbol) {
       LR0Item next_item(
           current_item.get_production(),
           current_item.get_position_in_production() + 1);
