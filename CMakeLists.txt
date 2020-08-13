@@ -4,10 +4,10 @@ project(roady_lang)
 set(CMAKE_CXX_STANDARD 20)
 
 include_directories(.)
+set(SOURCE_FILES main.cc)
 
-set(SOURCE_FILES main.cc tokenizer/common.cc tokenizer/regex.cc tokenizer/finite_automata.cc tokenizer/tokenizer.cc
-        parser/grammar.cc parser/automaton.cc)
-# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
-
+include_directories(tokenizer)
+add_subdirectory(tokenizer)
 add_executable(roady_lang ${SOURCE_FILES})
+
+add_subdirectory(Google_tests)
