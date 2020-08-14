@@ -9,12 +9,20 @@ RegularExpression::RegularExpression(std::string expression_string)
   first_operand_ = get_first_operand();
   operator_ = get_operator();
   second_operand_ = get_second_operand();
-  automaton_ = convert_to_nfa().convert_to_dfa();
+  auto nfa = convert_to_nfa();
+  auto dfa = nfa.convert_to_dfa();
+  automaton_ = dfa;
 }
 
 std::string RegularExpression::get_first_operand() {
-  if (expression_string_[0] != '(') {
-    first_operand_ = std::string(1, expression_string_[0]);
+  if (expression_string_.size() == 1) {
+    return expression_string_;
+  } else if (expression_string_[0] != '(') {
+    auto first_operand_length = expression_string_.size() / 2;
+    first_operand_ = expression_string_.substr(0, first_operand_length);
+    if (first_operand_[first_operand_.size() - 1] == '|') {
+      first_operand_ = first_operand_.substr(0, first_operand_.size() - 1);
+    }
   } else {
     auto matching_parenthesis_idx = get_matching_parenthesis_index(expression_string_);
     first_operand_ = expression_string_.substr(0, matching_parenthesis_idx);
@@ -48,6 +56,7 @@ std::string RegularExpression::get_second_operand() {
   auto second_operand_start_index = first_operand_.size() + operator_length;
   auto second_operand_length = expression_string_.size() - second_operand_start_index;
   second_operand_ = expression_string_.substr(second_operand_start_index, second_operand_length);
+
   return second_operand_;
 }
 

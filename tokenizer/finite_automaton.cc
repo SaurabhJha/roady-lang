@@ -114,13 +114,18 @@ NonDeterministicFiniteAutomaton::NonDeterministicFiniteAutomaton(const std::stri
  * my recursion.
  */
 std::unordered_set<int> NonDeterministicFiniteAutomaton::compute_closure(int state) {
+  if (closure_sets_.find(state) != closure_sets_.end()) {
+    return closure_sets_[state];
+  }
+
   std::unordered_set<int> closure_set = {state};
   for (auto state_reachable_on_epsilon : graph_[state][""]) {
     auto closure_set_of_next_state = compute_closure(state_reachable_on_epsilon);
     closure_set.insert(std::begin(closure_set_of_next_state), std::end(closure_set_of_next_state));
   }
 
-  return closure_set;
+  closure_sets_[state] = closure_set;
+  return closure_sets_[state];
 }
 
 std::unordered_set<int> NonDeterministicFiniteAutomaton::get_next_dfa_state(

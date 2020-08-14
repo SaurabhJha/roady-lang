@@ -63,6 +63,7 @@ class NonDeterministicFiniteAutomaton {
   int start_state_{};
   int final_state_{};
   TransitionGraph graph_;
+  std::unordered_map<int, std::unordered_set<int>> closure_sets_;
 
   std::unordered_set<int> compute_closure(int state);
   std::unordered_set<int> get_next_dfa_state(
