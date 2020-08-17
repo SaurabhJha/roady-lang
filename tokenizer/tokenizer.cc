@@ -14,10 +14,13 @@ std::string Token::get_lexeme() {
 
 Tokenizer::Tokenizer()
     :current_input_idx_{0}, has_more_{false} {
-  RegularExpression regex_for_id("(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z)"
-                                            "(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z"
-                                            "|0|1|2|3|4|5|6|7|8|9)*");
-  RegularExpression regex_for_number("(0|1|2|3|4|5|6|7|8|9)(0|1|2|3|4|5|6|7|8|9)*");
+  RegularExpression regex_for_id("(a|b|c|d|e|f|g|h|i|j|k|l"
+                                 "|m|n|o|p|q|r|s|t|u|v|w|x|y|z)"
+                                 "(a|b|c|d|e|f|g|h|i|j|k|l|m|"
+                                 "n|o|p|q|r|s|t|u|v|w|x|y|z"
+                                 "|0|1|2|3|4|5|6|7|8|9)*");
+  RegularExpression regex_for_number("(0|1|2|3|4|5|6|7|8|9)"
+                                     "(0|1|2|3|4|5|6|7|8|9)*");
   RegularExpression regex_for_plus("+");
   RegularExpression regex_for_minus("-");
   RegularExpression regex_for_star("*");

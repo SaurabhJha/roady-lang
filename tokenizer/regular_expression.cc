@@ -24,7 +24,8 @@ std::string RegularExpression::get_first_operand() {
       first_operand_ = first_operand_.substr(0, first_operand_.size() - 1);
     }
   } else {
-    auto matching_parenthesis_idx = get_matching_parenthesis_index(expression_string_);
+    auto matching_parenthesis_idx =
+        get_matching_parenthesis_index(expression_string_);
     first_operand_ = expression_string_.substr(0, matching_parenthesis_idx);
   }
 
@@ -47,15 +48,18 @@ RegularExpressionOperatorType RegularExpression::get_operator() {
 
 std::string RegularExpression::get_second_operand() {
   int operator_length;
-  if (operator_ == RegularExpressionOperatorType::unio || operator_ == RegularExpressionOperatorType::star) {
+  if (operator_ == RegularExpressionOperatorType::unio ||
+      operator_ == RegularExpressionOperatorType::star) {
     operator_length = 1;
   } else {
     operator_length = 0;
   }
 
   auto second_operand_start_index = first_operand_.size() + operator_length;
-  auto second_operand_length = expression_string_.size() - second_operand_start_index;
-  second_operand_ = expression_string_.substr(second_operand_start_index, second_operand_length);
+  auto second_operand_length = expression_string_.size() -
+      second_operand_start_index;
+  second_operand_ = expression_string_.substr(
+      second_operand_start_index, second_operand_length);
 
   return second_operand_;
 }
@@ -103,9 +107,9 @@ std::string RegularExpression::match(const std::string& input) {
     }
   }
 
-  if (match_idx == -1)
+  if (match_idx == -1) {
     return "";
-  else if (match_idx == 0){
+  } else if (match_idx == 0) {
     return std::string(1, input[0]);
   } else {
     return input.substr(0, match_idx + 1);
@@ -139,4 +143,4 @@ std::string trim_parenthesis(const std::string& input) {
     return input;
 }
 
-};
+}  // namespace tokenizer

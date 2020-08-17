@@ -4,7 +4,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <utility>
 
 #include "tokenizer/regular_expression.h"
 
@@ -44,6 +43,6 @@ class Tokenizer {
   bool has_more();
 };
 
-}
+}  // namespace tokenizer
 
 #endif  // TOKENIZER_TOKENIZER_H_

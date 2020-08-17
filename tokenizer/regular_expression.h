@@ -1,5 +1,5 @@
-#ifndef TOKENIZER_REGEX_H_
-#define TOKENIZER_REGEX_H_
+#ifndef TOKENIZER_REGULAR_EXPRESSION_H_
+#define TOKENIZER_REGULAR_EXPRESSION_H_
 
 #include <string>
 #include <utility>
@@ -35,4 +35,4 @@ std::string trim_parenthesis(const std::string& input);
 
 };  // namespace tokenizer
 
-#endif  // TOKENIZER_REGEX_H_
+#endif  // TOKENIZER_REGULAR_EXPRESSION_H_

@@ -30,7 +30,8 @@ class TransitionGraph {
   TransitionGraph() = default;
   ~TransitionGraph() = default;
 
-  void add_transition(int start_state, int end_state, const std::string& input_symbol);
+  void add_transition(
+      int start_state, int end_state, const std::string& input_symbol);
   void increment_vertex_numbers(int number);
   void combine_with(const TransitionGraph& other_graph);
   TransitionGraphRow operator[](int state);
@@ -47,9 +48,11 @@ class DeterministicFiniteAutomaton {
  public:
   DeterministicFiniteAutomaton() = default;
   DeterministicFiniteAutomaton(
-      int start_state, std::unordered_set<int> final_states, const TransitionGraph& graph)
-      :start_state_{start_state}, final_states_{std::move(final_states)}, current_state_{start_state}, graph_{graph}
-  {};
+      int start_state, std::unordered_set<int> final_states,
+      const TransitionGraph& graph)
+      :start_state_{start_state}, final_states_{std::move(final_states)},
+      current_state_{start_state}, graph_{graph}
+  {}
   ~DeterministicFiniteAutomaton() = default;
 
   void move(const std::string& input_symbol);
@@ -67,7 +70,8 @@ class NonDeterministicFiniteAutomaton {
 
   std::unordered_set<int> compute_closure(int state);
   std::unordered_set<int> get_next_dfa_state(
-      const std::unordered_set<int>& current_dfa_state, const std::string& transition_symbol);
+      const std::unordered_set<int>& current_dfa_state,
+      const std::string& transition_symbol);
   void increment_state_numbers(int number);
 
  public:
@@ -83,9 +87,9 @@ class NonDeterministicFiniteAutomaton {
   DeterministicFiniteAutomaton convert_to_dfa();
 };
 
-std::unordered_set<int> union_two_sets(const std::unordered_set<int>& set1, const std::unordered_set<int>& set2);
-std::unordered_set<int> intersect_two_sets(const std::unordered_set<int>& set1, const std::unordered_set<int>& set2);
+std::unordered_set<int> union_two_sets(
+    const std::unordered_set<int>& set1, const std::unordered_set<int>& set2);
 
-};  // namespace tokenizer
+}  // namespace tokenizer
 
 #endif  // TOKENIZER_FINITE_AUTOMATON_H_
