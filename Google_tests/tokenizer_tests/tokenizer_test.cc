@@ -59,13 +59,18 @@ TEST_F(TokenizerTest_NumericAddition_Test, ParenthesizedExpression) {
   auto tenth_token = tokenizer_for_lang.get_next_token();
   auto eleventh_token = tokenizer_for_lang.get_next_token();
 
-  EXPECT_EQ(first_token.get_token_type(), tokenizer::TokenType::open_paren);
+  EXPECT_EQ(first_token.get_token_type(),
+      tokenizer::TokenType::open_paren);
   EXPECT_EQ(first_token.get_lexeme(), "(");
-  EXPECT_EQ(second_token.get_token_type(), tokenizer::TokenType::number);
-  EXPECT_EQ(second_token.get_lexeme(), "12");
-  EXPECT_EQ(third_token.get_token_type(), tokenizer::TokenType::star);
+  EXPECT_EQ(second_token.get_token_type(),
+      tokenizer::TokenType::number);
+  EXPECT_EQ(second_token.get_lexeme(),
+      "12");
+  EXPECT_EQ(third_token.get_token_type(),
+      tokenizer::TokenType::star);
   EXPECT_EQ(third_token.get_lexeme(), "*");
-  EXPECT_EQ(fourth_token.get_token_type(), tokenizer::TokenType::number);
+  EXPECT_EQ(fourth_token.get_token_type(),
+      tokenizer::TokenType::number);
   EXPECT_EQ(fourth_token.get_lexeme(), "845");
   EXPECT_EQ(fifth_token.get_token_type(), tokenizer::TokenType::closed_paren);
   EXPECT_EQ(fifth_token.get_lexeme(), ")");
@@ -79,7 +84,8 @@ TEST_F(TokenizerTest_NumericAddition_Test, ParenthesizedExpression) {
   EXPECT_EQ(ninth_token.get_lexeme(), "/");
   EXPECT_EQ(tenth_token.get_token_type(), tokenizer::TokenType::number);
   EXPECT_EQ(tenth_token.get_lexeme(), "54");
-  EXPECT_EQ(eleventh_token.get_token_type(), tokenizer::TokenType::closed_paren);
+  EXPECT_EQ(eleventh_token.get_token_type(),
+      tokenizer::TokenType::closed_paren);
   EXPECT_EQ(eleventh_token.get_lexeme(), ")");
   EXPECT_EQ(tokenizer_for_lang.has_more(), false);
 }

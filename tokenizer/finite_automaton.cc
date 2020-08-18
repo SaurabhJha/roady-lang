@@ -4,6 +4,8 @@
 #include <iterator>
 #include <vector>
 
+#include "utils/set_utils.h"
+
 namespace tokenizer {
 
 void TransitionGraphRow::add_input_state_pair(
@@ -149,7 +151,7 @@ std::unordered_set<int> NonDeterministicFiniteAutomaton::get_next_dfa_state(
     auto adjacency_list_row = graph_[state];
     auto next_nfa_states_set = adjacency_list_row[transition_symbol];
     for (auto next_nfa_state : next_nfa_states_set)
-      next_dfa_state = union_two_sets(
+      next_dfa_state = utils::union_two_sets(
           next_dfa_state, compute_closure(next_nfa_state));
   }
 
@@ -363,19 +365,6 @@ DeterministicFiniteAutomaton NonDeterministicFiniteAutomaton::convert_to_dfa() {
   DeterministicFiniteAutomaton automaton(
       dfa_start_state_number, dfa_final_state_numbers, dfa_graph);
   return automaton;
-}
-
-std::unordered_set<int> union_two_sets(
-    const std::unordered_set<int> &set1, const std::unordered_set<int>& set2) {
-  std::unordered_set<int> two_set_union;
-  for (auto element : set1) {
-    two_set_union.insert(element);
-  }
-  for (auto element : set2) {
-    two_set_union.insert(element);
-  }
-
-  return two_set_union;
 }
 
 }  // namespace tokenizer

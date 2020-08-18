@@ -87,9 +87,6 @@ class NonDeterministicFiniteAutomaton {
   DeterministicFiniteAutomaton convert_to_dfa();
 };
 
-std::unordered_set<int> union_two_sets(
-    const std::unordered_set<int>& set1, const std::unordered_set<int>& set2);
-
 }  // namespace tokenizer
 
 #endif  // TOKENIZER_FINITE_AUTOMATON_H_
