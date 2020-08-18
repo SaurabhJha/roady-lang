@@ -1,12 +1,7 @@
-cmake_minimum_required(VERSION 3.15)
 project(tokenizer)
 
 include_directories(.)
-
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
-
-set(HEADER_FILES regular_expression.h finite_automaton.h tokenizer.h)
-set(SOURCE_FILES regular_expression.cc finite_automaton.cc tokenizer.cc)
+set(HEADER_FILES finite_automaton.h regular_expression.h tokenizer.h)
+set(SOURCE_FILES finite_automaton.cc regular_expression.cc tokenizer.cc)
 
 add_library(tokenizer STATIC ${SOURCE_FILES} ${HEADER_FILES})
