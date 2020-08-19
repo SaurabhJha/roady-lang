@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <deque>
 #include <iterator>
+#include <set>
 #include <vector>
 
 namespace tokenizer {
@@ -153,13 +154,24 @@ std::unordered_set<int> NonDeterministicFiniteAutomaton::get_next_dfa_state(
     const std::string& transition_symbol) {
   std::unordered_set<int> next_dfa_state;
   for (auto state : current_dfa_state) {
-    for (auto next_nfa_state : graph_[state][transition_symbol])
+    for (auto next_nfa_state : graph_[state][transition_symbol]) {
+      auto closure_set = compute_closure(next_nfa_state);
+      std::set<int> sorted_next_dfa_state(
+          std::begin(next_dfa_state),
+          std::end(next_dfa_state));
+      std::set<int> sorted_closure_set(
+          std::begin(closure_set),
+          std::end(closure_set));
       std::set_union(
-          next_dfa_state.begin(),
-          next_dfa_state.end(),
-          compute_closure(next_nfa_state).begin(),
-          compute_closure(next_nfa_state).end(),
-          std::inserter(next_dfa_state, next_dfa_state.begin()));
+          sorted_next_dfa_state.begin(),
+          sorted_next_dfa_state.end(),
+          sorted_closure_set.begin(),
+          sorted_closure_set.end(),
+          std::inserter(sorted_next_dfa_state, sorted_next_dfa_state.begin()));
+      next_dfa_state = std::unordered_set<int>(
+          sorted_next_dfa_state.begin(),
+          sorted_next_dfa_state.end());
+    }
   }
 
   return next_dfa_state;
