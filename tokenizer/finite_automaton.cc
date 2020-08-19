@@ -1,10 +1,9 @@
 #include "tokenizer/finite_automaton.h"
 
+#include <algorithm>
 #include <deque>
 #include <iterator>
 #include <vector>
-
-#include "utils/set_utils.h"
 
 namespace tokenizer {
 
@@ -155,8 +154,12 @@ std::unordered_set<int> NonDeterministicFiniteAutomaton::get_next_dfa_state(
   std::unordered_set<int> next_dfa_state;
   for (auto state : current_dfa_state) {
     for (auto next_nfa_state : graph_[state][transition_symbol])
-      next_dfa_state = utils::union_two_sets(
-          next_dfa_state, compute_closure(next_nfa_state));
+      std::set_union(
+          next_dfa_state.begin(),
+          next_dfa_state.end(),
+          compute_closure(next_nfa_state).begin(),
+          compute_closure(next_nfa_state).end(),
+          std::inserter(next_dfa_state, next_dfa_state.begin()));
   }
 
   return next_dfa_state;
