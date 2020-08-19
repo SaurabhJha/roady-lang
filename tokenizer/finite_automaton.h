@@ -4,10 +4,12 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <utility>
 
 namespace tokenizer {
 
+/**
+ * Represents an adjacency list row.
+ */
 class TransitionGraphRow {
  private:
   std::unordered_map<std::string, std::unordered_set<int>> adjacency_list_row_;
@@ -22,6 +24,9 @@ class TransitionGraphRow {
   std::unordered_set<int> operator[](const std::string& input);
 };
 
+/**
+ * Adjacency list representation of transition graph.
+ */
 class TransitionGraph {
  private:
   std::unordered_map<int, TransitionGraphRow> adjacency_list_;
@@ -37,6 +42,13 @@ class TransitionGraph {
   TransitionGraphRow operator[](int state);
 };
 
+/**
+ * In our world, a deterministic automaton consists of
+ * 1. An initial state.
+ * 2. A set of states designated as a final state.
+ * 3. A transition function that maps a state and a transition symbol to a
+ *    state.
+ */
 class DeterministicFiniteAutomaton {
  private:
   int start_state_{};
@@ -45,6 +57,7 @@ class DeterministicFiniteAutomaton {
   TransitionGraph graph_;
   bool has_accepted_ = false;
   bool is_dead_ = false;
+
  public:
   DeterministicFiniteAutomaton() = default;
   DeterministicFiniteAutomaton(
@@ -61,6 +74,13 @@ class DeterministicFiniteAutomaton {
   bool is_dead();
 };
 
+/**
+ * In our world, a non deterministic finite automaton consists of
+ * 1. An initial state.
+ * 2. A final state.
+ * 3. A transition function that maps a state and a transition symbol to a
+ *    state.
+ */
 class NonDeterministicFiniteAutomaton {
  private:
   int start_state_{};

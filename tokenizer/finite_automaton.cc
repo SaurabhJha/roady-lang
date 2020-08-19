@@ -31,11 +31,13 @@ void TransitionGraphRow::increment_values(int number) {
 std::unordered_set<std::string>
     TransitionGraphRow::get_non_epsilon_transitions() {
   std::unordered_set<std::string> non_epsilon_inputs;
+
   for (const auto& input_states_pair : adjacency_list_row_) {
     auto input = input_states_pair.first;
     if (!input.empty())
       non_epsilon_inputs.insert(input);
   }
+
   return non_epsilon_inputs;
 }
 
@@ -46,9 +48,9 @@ std::unordered_set<int> TransitionGraphRow::operator[](
 
 void TransitionGraph::add_transition(
     int start_state, int end_state, const std::string& input_symbol) {
-  auto row = adjacency_list_[start_state];
-  row.add_input_state_pair(input_symbol, end_state);
-  adjacency_list_[start_state] = row;
+  auto adjacency_list_row = adjacency_list_[start_state];
+  adjacency_list_row.add_input_state_pair(input_symbol, end_state);
+  adjacency_list_[start_state] = adjacency_list_row;
 }
 
 void TransitionGraph::increment_vertex_numbers(int number) {
@@ -56,9 +58,9 @@ void TransitionGraph::increment_vertex_numbers(int number) {
 
   for (const auto& vertex_row_pair : adjacency_list_) {
     auto vertex = vertex_row_pair.first;
-    auto row = vertex_row_pair.second;
-    row.increment_values(number);
-    new_adjacency_list[vertex + number] = row;
+    auto adjacency_list_row = vertex_row_pair.second;
+    adjacency_list_row.increment_values(number);
+    new_adjacency_list[vertex + number] = adjacency_list_row;
   }
 
   adjacency_list_ = new_adjacency_list;
@@ -83,18 +85,18 @@ TransitionGraphRow TransitionGraph::operator[](int state) {
 void DeterministicFiniteAutomaton::move(const std::string &input_symbol) {
   // There is only one next state for a state input pair.
   if (!is_dead_) {
-    int next_state = -1;
+    int next_state = -1;  // Default value. Used to mark "no state found".
     for (auto state : graph_[current_state_][input_symbol])
+      // for loop to check if there is one or zero states for this state-input
+      // pair.
       next_state = state;
     current_state_ = next_state;
+
     if (current_state_ == -1) {
       is_dead_ = true;
       has_accepted_ = false;
     } else {
-      has_accepted_ = std::find(
-          std::begin(final_states_),
-          std::end(final_states_),
-          current_state_) != std::end(final_states_);
+      has_accepted_ = final_states_.find(current_state_) != final_states_.end();
     }
   }
 }
@@ -121,8 +123,8 @@ NonDeterministicFiniteAutomaton::NonDeterministicFiniteAutomaton(
 }
 
 /**
- * There was a choice of doing this algorithm with either BFS or DFS. I chose DFS to workshop
- * my recursion.
+ * There was a choice of doing this algorithm with either BFS or DFS.
+ * I chose DFS to workshop my recursion.
  */
 std::unordered_set<int> NonDeterministicFiniteAutomaton::compute_closure(
     int state) {
@@ -143,14 +145,16 @@ std::unordered_set<int> NonDeterministicFiniteAutomaton::compute_closure(
   return closure_sets_[state];
 }
 
+/**
+ * Compute the set of states that would become a DFA state for a DFA state -
+ * input symbol pair.
+ */
 std::unordered_set<int> NonDeterministicFiniteAutomaton::get_next_dfa_state(
     const std::unordered_set<int>& current_dfa_state,
     const std::string& transition_symbol) {
   std::unordered_set<int> next_dfa_state;
   for (auto state : current_dfa_state) {
-    auto adjacency_list_row = graph_[state];
-    auto next_nfa_states_set = adjacency_list_row[transition_symbol];
-    for (auto next_nfa_state : next_nfa_states_set)
+    for (auto next_nfa_state : graph_[state][transition_symbol])
       next_dfa_state = utils::union_two_sets(
           next_dfa_state, compute_closure(next_nfa_state));
   }
