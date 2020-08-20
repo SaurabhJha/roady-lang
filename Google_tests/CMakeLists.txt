@@ -9,6 +9,9 @@ set(TOKENIZER_TEST_FILES
         tokenizer_tests/finite_automaton_test.cc
         tokenizer_tests/regular_expression_test.cc
         tokenizer_tests/tokenizer_test.cc)
-add_executable(Google_Tests_run ${TOKENIZER_TEST_FILES})
+set(PARSER_TEST_FILES
+        parser_tests/grammar_test.cc)
+add_executable(Google_Tests_run ${TOKENIZER_TEST_FILES} ${PARSER_TEST_FILES})
 target_link_libraries(Google_Tests_run tokenizer)
+target_link_libraries(Google_Tests_run parser)
 target_link_libraries(Google_Tests_run gtest gtest_main)
