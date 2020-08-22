@@ -88,3 +88,8 @@ TEST_F(GrammarTest, FollowSetTest) {
   EXPECT_TRUE(
       follow_set_of_factor.find(")") != follow_set_of_factor.end());
 }
+
+TEST_F(GrammarTest, ProductionEqualityTest) {
+  EXPECT_FALSE(expr_term_production == expr_plus_production);
+  EXPECT_TRUE(expr_term_production == expr_term_production);
+}

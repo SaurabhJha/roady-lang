@@ -10,7 +10,7 @@ set(TOKENIZER_TEST_FILES
         tokenizer_tests/regular_expression_test.cc
         tokenizer_tests/tokenizer_test.cc)
 set(PARSER_TEST_FILES
-        parser_tests/grammar_test.cc)
+        parser_tests/grammar_test.cc parser_tests/parser_test.cc)
 add_executable(Google_Tests_run ${TOKENIZER_TEST_FILES} ${PARSER_TEST_FILES})
 target_link_libraries(Google_Tests_run tokenizer)
 target_link_libraries(Google_Tests_run parser)

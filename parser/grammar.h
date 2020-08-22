@@ -24,14 +24,12 @@ class Production {
   std::vector<std::string> get_body();
 };
 
+bool operator==(Production production_lhs, Production production_rhs);
+
 class Grammar {
  private:
   std::vector<Production> productions_;
   std::string start_symbol_;
-
-  bool is_non_terminal(const std::string& grammar_symbol);
-  std::vector<Production> get_productions_of_non_terminal(
-      const std::string& non_terminal);
 
  public:
   Grammar() = default;
@@ -41,6 +39,9 @@ class Grammar {
   {}
   ~Grammar() = default;
 
+  bool is_non_terminal(const std::string& grammar_symbol);
+  std::vector<Production> get_productions_of_non_terminal(
+      const std::string& non_terminal);
   std::unordered_set<std::string> compute_first_set(
       const std::string& grammar_symbol);
   std::unordered_set<std::string> compute_first_set(

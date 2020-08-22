@@ -12,6 +12,11 @@ std::vector<std::string> Production::get_body() {
   return body_;
 }
 
+bool operator==(Production production_lhs, Production production_rhs) {
+  return (production_lhs.get_head() == production_rhs.get_head() &&
+          production_lhs.get_body() == production_rhs.get_body());
+}
+
 bool Grammar::is_non_terminal(const std::string& grammar_symbol) {
   for (auto production : productions_) {
     if (production.get_head() == grammar_symbol) {

@@ -1,6 +1,6 @@
-#include "tokenizer/tokenizer.h"
+#include "parser/grammar.h"
 
 int main() {
-  auto tok = tokenizer::Tokenizer();
-  tok.tokenize("12+3");
+  parser::Grammar grammar;
+  parser::Production production;
 }
