@@ -1,4 +1,3 @@
-#include <deque>
 #include <iterator>
 
 #include "parser/parser.h"
@@ -53,23 +52,49 @@ LRItemSet::LRItemSet(const parser::LRItem& lr_item, parser::Grammar grammar) {
   items_ = items;
 }
 
-std::vector<LRItem> LRItemSet::get_items() {
-  return items_;
-}
+LRItemSet::LRItemSet(
+    LRItemSet item_set,
+    const std::string& transition_symbol,
+    const parser::Grammar& grammar) {
+  std::vector<LRItem> new_items = {};
 
-std::vector<std::string> LRItemSet::get_symbols_to_reduce_on(
-    parser::Grammar grammar) {
-  std::vector<std::string> symbols_to_reduce_on = {};
-  for (auto item : items_) {
-    if (item.has_position_at_the_end()) {
-      auto production_head = item.get_production().get_head();
-      for (const auto& symbol : grammar.compute_follow_set(production_head)) {
-        symbols_to_reduce_on.push_back(symbol);
+  for (auto item : item_set.get_items()) {
+    if (!item.has_position_at_the_end() &&
+        item.get_next_symbol() == transition_symbol) {
+      auto candidate_new_item = LRItem(
+          item.get_production(),
+          item.get_position_in_body() + 1);
+      auto candidate_new_item_set = LRItemSet(candidate_new_item, grammar);
+      for (const auto& candidate_item : candidate_new_item_set.get_items()) {
+        if (std::find(
+            std::begin(new_items), std::end(new_items), candidate_item)
+            == std::end(new_items)) {
+          new_items.push_back(candidate_item);
+        }
       }
     }
   }
 
-  return symbols_to_reduce_on;
+  items_ = new_items;
+}
+
+std::vector<LRItem> LRItemSet::get_items() {
+  return items_;
+}
+
+std::vector<std::pair<std::string, LRItemSet>> LRItemSet::get_transitions(
+    const parser::Grammar& grammar) {
+  std::vector<std::pair<std::string, LRItemSet>> transitions;
+
+  for (auto item : items_) {
+    if (!item.has_position_at_the_end()) {
+      auto next_symbol = item.get_next_symbol();
+      auto next_item_set = LRItemSet(*this, next_symbol, grammar);
+      transitions.emplace_back(next_symbol, next_item_set);
+    }
+  }
+
+  return transitions;
 }
 
 bool operator==(LRItemSet lr_item_set_lhs, LRItemSet lr_item_set_rhs) {
@@ -98,5 +123,100 @@ bool operator==(LRItemSet lr_item_set_lhs, LRItemSet lr_item_set_rhs) {
 
   return true;
 }
+
+void ParsingTableRow::add_symbol_action_pair(
+    const std::string& symbol, ParsingAction action) {
+  row_[symbol] = action;
+}
+
+ParsingAction ParsingTableRow::operator[](const std::string& symbol) {
+  if (row_.find(symbol) == row_.end()) {
+    ParsingAction error_action(ParsingActionType::error, -1);
+    return error_action;
+  }
+  return row_[symbol];
+}
+
+void ParsingTable::add_new_entry(
+    int state, const std::string& symbol, ParsingAction action) {
+  auto row = table_[state];
+  row.add_symbol_action_pair(symbol, action);
+  table_[state] = row;
+}
+
+ParsingTableRow ParsingTable::operator[](int state) {
+  return table_[state];
+}
+
+Parser::Parser(Grammar grammar) {
+  auto start_production = grammar.get_productions_of_non_terminal(
+      grammar.get_start_symbol())[0];
+  auto start_lr_item = LRItem(start_production, 0);
+  auto start_lr_item_set = LRItemSet(start_lr_item, grammar);
+
+  std::deque<LRItemSet> queue = {start_lr_item_set};
+  std::vector<LRItemSet> seen_item_sets = {start_lr_item_set};
+
+  while (!queue.empty()) {
+    auto current_lr_item_set = queue.front();
+    queue.pop_front();
+    auto current_state_number = std::distance(
+        std::begin(seen_item_sets),
+        std::find(
+            std::begin(seen_item_sets),
+            std::end(seen_item_sets),
+            current_lr_item_set));
+
+    // Populate shift moves for the current state.
+    for (const auto& transition :
+         current_lr_item_set.get_transitions(grammar)) {
+      auto transition_symbol = transition.first;
+      auto next_lr_item_set = transition.second;
+      if (std::find(
+          std::begin(seen_item_sets),
+          std::end(seen_item_sets),
+          next_lr_item_set) == std::end(seen_item_sets)) {
+        seen_item_sets.push_back(next_lr_item_set);
+        queue.push_back(next_lr_item_set);
+      }
+      auto next_state_number = std::distance(
+          std::begin(seen_item_sets),
+          std::find(
+              std::begin(seen_item_sets),
+              std::end(seen_item_sets),
+              next_lr_item_set));
+      auto next_action = ParsingAction(
+          ParsingActionType::shift, next_state_number);
+      table_.add_new_entry(
+          current_state_number, transition_symbol, next_action);
+    }
+
+    // Populate reduce moves for the current state.
+    for (auto lr_item : current_lr_item_set.get_items()) {
+      if (lr_item.has_position_at_the_end()) {
+        auto production = lr_item.get_production();
+        auto production_head = production.get_head();
+        auto production_number = grammar.get_production_number(production);
+        for (const auto& transition_symbol :
+             grammar.compute_follow_set(production_head)) {
+          if (transition_symbol == "$" &&
+              production_head == grammar.get_start_symbol()) {
+            auto next_action = ParsingAction(
+                ParsingActionType::accept, -1);
+            table_.add_new_entry(
+                current_state_number, transition_symbol, next_action);
+          } else {
+            auto next_action = ParsingAction(
+                ParsingActionType::reduce, production_number);
+            table_.add_new_entry(
+                current_state_number, transition_symbol, next_action);
+          }
+        }
+      }
+    }
+  }
+}
+
+
 
 }  // namespace parser

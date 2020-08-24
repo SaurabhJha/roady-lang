@@ -13,6 +13,7 @@ class ParserTest : public ::testing::Test {
   parser::Production factor_paran_production;
   std::vector<parser::Production> productions;
   parser::Grammar grammar;
+  parser::Parser parser;
 
   void SetUp() override {
     start_production = parser::Production("expr'", {"expr"});
@@ -31,6 +32,7 @@ class ParserTest : public ::testing::Test {
         term_star_production, term_factor_production, factor_number_production,
         factor_paran_production};
     grammar = parser::Grammar(productions, "expr'");
+    parser = parser::Parser(grammar);
   }
 };
 
@@ -97,15 +99,25 @@ TEST_F(ParserTest, LRItemSetFromLRItemTest3) {
     parser::LRItem(term_factor_production, 0),
     parser::LRItem(factor_paran_production, 0),
     parser::LRItem(factor_number_production, 0)});
+
+  EXPECT_TRUE(expected_item_set == actual_item_set);
 }
 
-TEST_F(ParserTest, LRItemSetSymbolsToReduceTest) {
-  parser::LRItem item(expr_plus_production, 3);
-  parser::LRItemSet item_set(item, grammar);
-  auto actual_symbols_to_reduce_on =
-      item_set.get_symbols_to_reduce_on(grammar);
+TEST_F(ParserTest, LRItemSetFromLRItemSetAndTransitionSymbol) {
+  parser::LRItem item(expr_plus_production, 1);
+  parser::LRItemSet input_item_set(item, grammar);
+  parser::LRItemSet actual_item_set(
+      input_item_set, "+", grammar);
+  parser::LRItemSet expected_item_set({
+    parser::LRItem(expr_plus_production, 2),
+    parser::LRItem(term_star_production, 0),
+    parser::LRItem(term_factor_production, 0),
+    parser::LRItem(factor_paran_production, 0),
+    parser::LRItem(factor_number_production, 0)});
 
-  std::vector<std::string> expected_symbols_to_reduce_on = {"+", ")", "$"};
-  EXPECT_TRUE(
-      expected_symbols_to_reduce_on == actual_symbols_to_reduce_on);
+  EXPECT_TRUE(expected_item_set == actual_item_set);
+}
+
+TEST_F(ParserTest, ParserConstructorTest) {
+  parser = parser::Parser(grammar);
 }

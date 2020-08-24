@@ -26,6 +26,10 @@ bool Grammar::is_non_terminal(const std::string& grammar_symbol) {
   return false;
 }
 
+std::string Grammar::get_start_symbol() {
+  return start_symbol_;
+}
+
 std::vector<Production> Grammar::get_productions_of_non_terminal(
     const std::string& non_terminal) {
   std::vector<Production> productions_of_non_terminal;
@@ -149,6 +153,14 @@ std::unordered_set<std::string> Grammar::compute_follow_set(
   }
 
   return follow_set;
+}
+
+int Grammar::get_production_number(const Production& production) {
+  for (auto idx = 0; idx < productions_.size(); ++idx) {
+    if (productions_[idx] == production)
+      return idx;
+  }
+  return -1;
 }
 
 }  // namespace parser
