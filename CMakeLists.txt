@@ -6,9 +6,18 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include_directories(.)
-add_executable(roady_lang main.cc)
-add_subdirectory(tokenizer)
-target_link_libraries(roady_lang tokenizer)
-add_subdirectory(parser)
-target_link_libraries(roady_lang parser)
+set(SOURCE_FILES
+        tokenizer/finite_automaton.cc
+        tokenizer/regular_expression.cc
+        tokenizer/tokenizer.cc
+        parser/grammar.cc
+        parser/parser.cc
+        main.cc)
+set(HEADER_FILES
+        tokenizer/finite_automaton.h
+        tokenizer/regular_expression.h
+        tokenizer/tokenizer.h
+        parser/grammar.h
+        parser/parser.h)
+add_executable(roady_lang ${SOURCE_FILES} ${HEADER_FILES})
 add_subdirectory(Google_tests)
