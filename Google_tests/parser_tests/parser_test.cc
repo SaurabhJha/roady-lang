@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "parser/parser.h"
+#include "tokenizer/tokenizer.h"
 
 class ParserTest : public ::testing::Test {
  protected:
@@ -14,6 +15,7 @@ class ParserTest : public ::testing::Test {
   std::vector<parser::Production> productions;
   parser::Grammar grammar;
   parser::Parser parser;
+  tokenizer::Tokenizer tok;
 
   void SetUp() override {
     start_production = parser::Production("expr'", {"expr"});
@@ -33,6 +35,7 @@ class ParserTest : public ::testing::Test {
         factor_paran_production};
     grammar = parser::Grammar(productions, "expr'");
     parser = parser::Parser(grammar);
+    tok = tokenizer::Tokenizer();
   }
 };
 
@@ -118,6 +121,62 @@ TEST_F(ParserTest, LRItemSetFromLRItemSetAndTransitionSymbol) {
   EXPECT_TRUE(expected_item_set == actual_item_set);
 }
 
-TEST_F(ParserTest, ParserConstructorTest) {
-  parser = parser::Parser(grammar);
+TEST_F(ParserTest, ParserConstructorTest1) {
+  std::vector<tokenizer::Token> tokens_to_parse;
+  tok.tokenize("132+13*655");
+  while (tok.has_more()) {
+    tokens_to_parse.push_back(tok.get_next_token());
+  }
+  tokens_to_parse.emplace_back(
+      tokenizer::TokenType::dollar, "");
+
+  parser.parse(tokens_to_parse);
+  std::vector<std::pair<parser::ParsingActionType, parser::Production>>
+    parser_outputs;
+  while (!parser.has_accepted() && !parser.is_stuck()) {
+    parser_outputs.push_back(parser.make_next_move());
+  }
+
+  EXPECT_TRUE(parser.has_accepted());
+  EXPECT_FALSE(parser.is_stuck());
+}
+
+TEST_F(ParserTest, ParserConstructorTest2) {
+  std::vector<tokenizer::Token> tokens_to_parse;
+  tok.tokenize("132++");
+  while (tok.has_more()) {
+    tokens_to_parse.push_back(tok.get_next_token());
+  }
+  tokens_to_parse.emplace_back(
+      tokenizer::TokenType::dollar, "");
+
+  parser.parse(tokens_to_parse);
+  std::vector<std::pair<parser::ParsingActionType, parser::Production>>
+      parser_outputs;
+  while (!parser.has_accepted() && !parser.is_stuck()) {
+    parser_outputs.push_back(parser.make_next_move());
+  }
+
+  EXPECT_FALSE(parser.has_accepted());
+  EXPECT_TRUE(parser.is_stuck());
+}
+
+TEST_F(ParserTest, ParserConstructorTest3) {
+  std::vector<tokenizer::Token> tokens_to_parse;
+  tok.tokenize("(123+1232)*(854+45)");
+  while (tok.has_more()) {
+    tokens_to_parse.push_back(tok.get_next_token());
+  }
+  tokens_to_parse.emplace_back(
+      tokenizer::TokenType::dollar, "");
+
+  parser.parse(tokens_to_parse);
+  std::vector<std::pair<parser::ParsingActionType, parser::Production>>
+      parser_outputs;
+  while (!parser.has_accepted() && !parser.is_stuck()) {
+    parser_outputs.push_back(parser.make_next_move());
+  }
+
+  EXPECT_TRUE(parser.has_accepted());
+  EXPECT_FALSE(parser.is_stuck());
 }

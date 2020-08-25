@@ -50,6 +50,7 @@ class Grammar {
   std::unordered_set<std::string> compute_follow_set(
       const std::string& non_terminal);
   int get_production_number(const Production& production);
+  Production get_production_by_number(int production_number);
 };
 
 }  // namespace parser

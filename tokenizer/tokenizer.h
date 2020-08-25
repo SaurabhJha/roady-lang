@@ -10,8 +10,8 @@
 namespace tokenizer {
 
 enum class TokenType {
-  id, number, plus, minus, star, slash, equals,
-  double_equals, invalid, open_paren, closed_paren };
+  id, number, plus, minus, star, slash, equals, double_equals,
+  open_paren, closed_paren, dollar, invalid};
 
 class Token {
  private:

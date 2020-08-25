@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "parser/grammar.h"
+#include "tokenizer/tokenizer.h"
 
 namespace parser {
 
@@ -67,6 +68,13 @@ class ParsingAction {
     :action_type_{action_type}, number_{number}
   {}
   ~ParsingAction() = default;
+
+  ParsingActionType get_action_type() {
+    return action_type_;
+  }
+  int get_number() {
+    return number_;
+  }
 };
 
 class ParsingTableRow {
@@ -93,15 +101,31 @@ class ParsingTable {
   ParsingTableRow operator[](int state);
 };
 
+std::string map_token_type_to_terminal(tokenizer::TokenType token_type);
+
 class Parser {
  private:
   ParsingTable table_;
+  Grammar grammar_;
   std::deque<int> stack_;
+  bool has_accepted_;
+  bool is_stuck_;
+  std::vector<tokenizer::Token> input_;
+  int current_position_;
 
  public:
   Parser() = default;
   explicit Parser(Grammar grammar);
   ~Parser() = default;
+
+  void parse(std::vector<tokenizer::Token> tokens);
+  std::pair<ParsingActionType, Production> make_next_move();
+  bool has_accepted() {
+    return has_accepted_;
+  }
+  bool is_stuck() {
+    return is_stuck_;
+  }
 };
 
 }  // namespace parser

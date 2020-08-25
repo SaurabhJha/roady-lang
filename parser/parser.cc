@@ -1,4 +1,5 @@
 #include <iterator>
+#include <utility>
 
 #include "parser/parser.h"
 
@@ -148,7 +149,40 @@ ParsingTableRow ParsingTable::operator[](int state) {
   return table_[state];
 }
 
+std::string map_token_type_to_terminal(tokenizer::TokenType token_type) {
+  if (token_type == tokenizer::TokenType::id) {
+    return "id";
+  } else if (token_type == tokenizer::TokenType::number) {
+    return "number";
+  } else if (token_type == tokenizer::TokenType::plus) {
+    return "+";
+  } else if (token_type == tokenizer::TokenType::minus) {
+    return "-";
+  } else if (token_type == tokenizer::TokenType::star) {
+    return "*";
+  } else if (token_type == tokenizer::TokenType::slash) {
+    return "/";
+  } else if (token_type == tokenizer::TokenType::equals) {
+    return "=";
+  } else if (token_type == tokenizer::TokenType::double_equals) {
+    return "==";
+  } else if (token_type == tokenizer::TokenType::open_paren) {
+    return "(";
+  } else if (token_type == tokenizer::TokenType::closed_paren) {
+    return ")";
+  } else if (token_type == tokenizer::TokenType::dollar) {
+    return "$";
+  }
+
+  return "";
+}
+
 Parser::Parser(Grammar grammar) {
+  grammar_ = grammar;
+  stack_ = {0};
+  has_accepted_ = false;
+  is_stuck_ = false;
+
   auto start_production = grammar.get_productions_of_non_terminal(
       grammar.get_start_symbol())[0];
   auto start_lr_item = LRItem(start_production, 0);
@@ -217,6 +251,40 @@ Parser::Parser(Grammar grammar) {
   }
 }
 
+void Parser::parse(std::vector<tokenizer::Token> tokens) {
+  input_ = std::move(tokens);
+  current_position_ = 0;
+}
 
+std::pair<ParsingActionType, Production> Parser::make_next_move() {
+  auto next_token = input_[current_position_];
+  auto token_string = map_token_type_to_terminal(next_token.get_token_type());
+  auto current_state = stack_.back();
+  auto next_action = table_[current_state][token_string];
+
+  if (next_action.get_action_type() == ParsingActionType::shift) {
+    auto next_state = next_action.get_number();
+    stack_.push_back(next_state);
+    current_position_ += 1;
+    return {ParsingActionType::shift, Production()};
+  } else if (next_action.get_action_type() == ParsingActionType::reduce) {
+    auto production_number = next_action.get_number();
+    auto production = grammar_.get_production_by_number(production_number);
+    for (int idx = 0; idx < production.get_body().size(); ++idx) {
+      stack_.pop_back();
+    }
+    auto next_state = table_[stack_.back()][production.get_head()].get_number();
+    stack_.push_back(next_state);
+    return {ParsingActionType::reduce, production};
+  } else if (next_action.get_action_type() == ParsingActionType::accept) {
+    has_accepted_ = true;
+    is_stuck_ = false;
+    return {ParsingActionType::accept, Production()};
+  } else {
+    is_stuck_ = true;
+    has_accepted_ = false;
+    return {ParsingActionType::error, Production()};
+  }
+}
 
 }  // namespace parser

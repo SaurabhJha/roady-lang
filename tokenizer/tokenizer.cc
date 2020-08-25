@@ -54,6 +54,7 @@ Tokenizer::Tokenizer()
 
 void Tokenizer::tokenize(std::string input) {
   input_ = std::move(input);
+  has_more_ = true;
 }
 
 Token Tokenizer::get_next_token() {

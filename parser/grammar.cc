@@ -163,4 +163,8 @@ int Grammar::get_production_number(const Production& production) {
   return -1;
 }
 
+Production Grammar::get_production_by_number(int production_number) {
+  return productions_[production_number];
+}
+
 }  // namespace parser
