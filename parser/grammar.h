@@ -8,20 +8,49 @@
 
 namespace parser {
 
+enum class SyntaxDirectedDefinitionType {copy, tree};
+
+class SyntaxDirectedDefinition {
+ private:
+  SyntaxDirectedDefinitionType definition_type_;
+  std::vector<int> children_indices_;
+  std::string root_data_;
+
+ public:
+  SyntaxDirectedDefinition(
+      SyntaxDirectedDefinitionType definition_type = SyntaxDirectedDefinitionType::copy,
+      std::vector<int> children_indices = {0},
+      std::string root_data = "")
+    :definition_type_{definition_type}, children_indices_{std::move(children_indices)},
+    root_data_{std::move(root_data)}
+  {}
+  ~SyntaxDirectedDefinition() = default;
+
+  SyntaxDirectedDefinitionType get_definition_type();
+  std::vector<int> get_children_indices();
+  std::string get_root_data();
+};
+
 class Production {
  private:
   std::string head_;
   std::vector<std::string> body_;
+  SyntaxDirectedDefinition definition_;
 
  public:
   Production() = default;
-  Production(std::string head, std::vector<std::string> body)
-    :head_{std::move(head)}, body_{std::move(body)}
+  Production(
+      std::string head,
+      std::vector<std::string> body,
+      const SyntaxDirectedDefinition& definition = SyntaxDirectedDefinition())
+    :head_{std::move(head)}, body_{std::move(body)},
+    definition_{definition}
   {}
   ~Production() = default;
 
   std::string get_head();
   std::vector<std::string> get_body();
+  SyntaxDirectedDefinition get_definition();
 };
 
 bool operator==(Production production_lhs, Production production_rhs);

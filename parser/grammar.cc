@@ -4,12 +4,28 @@
 
 namespace parser {
 
+SyntaxDirectedDefinitionType SyntaxDirectedDefinition::get_definition_type() {
+  return definition_type_;
+}
+
+std::vector<int> SyntaxDirectedDefinition::get_children_indices() {
+  return children_indices_;
+}
+
+std::string SyntaxDirectedDefinition::get_root_data() {
+  return root_data_;
+}
+
 std::string Production::get_head() {
   return head_;
 }
 
 std::vector<std::string> Production::get_body() {
   return body_;
+}
+
+SyntaxDirectedDefinition Production::get_definition() {
+  return definition_;
 }
 
 bool operator==(Production production_lhs, Production production_rhs) {
