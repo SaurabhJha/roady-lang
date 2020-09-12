@@ -4,3 +4,7 @@ executable*
 cmake-build-debug
 cmake-build-release
 .idea
+
+# CMake
+bin
+build

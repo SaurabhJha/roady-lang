@@ -4,7 +4,7 @@
 
 namespace ast {
 
-SyntaxTreeNode ast::construct_syntax_tree(
+SyntaxTreeNode construct_syntax_tree(
     std::vector<tokenizer::Token> tokens,
     const std::vector<std::pair<
         parser::ParsingActionType,
